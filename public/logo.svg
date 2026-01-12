@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <title>Greenhouse Marketplace - Icon</title>
+
+  <!-- Colors -->
+  <defs>
+    <linearGradient id="ringGrad" x1="120" y1="180" x2="392" y2="332" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2F7D32"/>
+      <stop offset="1" stop-color="#2AA8FF"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="220" y1="230" x2="292" y2="292" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#66BB6A"/>
+      <stop offset="1" stop-color="#2F7D32"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <!-- Ring -->
+  <g filter="url(#softShadow)">
+    <circle cx="256" cy="232" r="140" stroke="url(#ringGrad)" stroke-width="12" stroke-linecap="round" opacity="0.95"/>
+    <!-- Nodes -->
+    <g fill="#2F7D32">
+      <circle cx="256" cy="92" r="10"/>
+      <circle cx="356" cy="132" r="10" fill="#2AA8FF"/>
+      <circle cx="396" cy="232" r="10" fill="#2AA8FF"/>
+      <circle cx="356" cy="332" r="10" fill="#2AA8FF"/>
+      <circle cx="256" cy="372" r="10"/>
+      <circle cx="156" cy="332" r="10" fill="#2F7D32"/>
+      <circle cx="116" cy="232" r="10" fill="#2F7D32"/>
+      <circle cx="156" cy="132" r="10" fill="#2F7D32"/>
+    </g>
+
+    <!-- Small breaks in ring for a "network" feel -->
+    <g stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" opacity="0.9">
+      <path d="M256 92 A140 140 0 0 1 356 132"/>
+      <path d="M396 232 A140 140 0 0 1 356 332"/>
+      <path d="M256 372 A140 140 0 0 1 156 332"/>
+      <path d="M116 232 A140 140 0 0 1 156 132"/>
+    </g>
+  </g>
+
+  <!-- Greenhouse icon -->
+  <g filter="url(#softShadow)">
+    <!-- House outline -->
+    <path
+      d="M176 260 V184 L256 132 L336 184 V260"
+      stroke="#1F5F2A"
+      stroke-width="14"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+    />
+    <!-- Base platform -->
+    <path
+      d="M192 260 H320"
+      stroke="#1F5F2A"
+      stroke-width="14"
+      stroke-linecap="round"
+    />
+
+    <!-- Floor tiles -->
+    <g stroke="#1F5F2A" stroke-width="10" stroke-linecap="round" opacity="0.95">
+      <path d="M224 260 V228"/>
+      <path d="M256 260 V220"/>
+      <path d="M288 260 V228"/>
+      <path d="M192 240 H320"/>
+    </g>
+
+    <!-- Sprout stem -->
+    <path
+      d="M256 254 C256 242 256 230 256 218"
+      stroke="#2F7D32"
+      stroke-width="10"
+      stroke-linecap="round"
+    />
+
+    <!-- Leaves -->
+    <path
+      d="M256 220
+         C238 206 214 206 200 220
+         C214 238 238 240 256 228 Z"
+      fill="url(#leafGrad)"
+    />
+    <path
+      d="M256 220
+         C274 206 298 206 312 220
+         C298 238 274 240 256 228 Z"
+      fill="url(#leafGrad)"
+    />
+    <!-- Leaf veins -->
+    <g stroke="#1F5F2A" stroke-width="3" stroke-linecap="round" opacity="0.6">
+      <path d="M256 228 C236 228 220 224 208 216"/>
+      <path d="M256 228 C276 228 292 224 304 216"/>
+    </g>
+  </g>
+</svg>

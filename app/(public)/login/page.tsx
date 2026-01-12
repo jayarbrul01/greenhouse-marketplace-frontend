@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { Card } from "@/components/ui/Card";
@@ -24,6 +25,11 @@ export default function LoginPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     if (!credentialResponse.credential) {
@@ -64,24 +70,74 @@ export default function LoginPage() {
   };
 
   return (
-    <Container className="max-w-md">
-      <Card title={t("login")}>
+    <Container className="max-w-md mx-auto px-4 sm:px-6">
+      <Card 
+        className={`
+          transition-all duration-500 ease-out
+          ${isMounted 
+            ? "opacity-100 translate-y-0 scale-100" 
+            : "opacity-0 translate-y-4 scale-95"
+          }
+        `}
+      >
+        <div className="flex items-center justify-center">
+          <Image
+            src="/logo_2.png"
+            alt={t("appName")}
+            width={80}
+            height={80}
+            className="h-16 w-16 sm:h-20 sm:w-20 object-contain"
+            priority
+            unoptimized
+          />
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            {t("login")}
+          </h2>
+        </div>
         <div className="space-y-4">
-          <div>
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-x-0" 
+                : "opacity-0 -translate-x-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "100ms" : "0ms" }}
+          >
             <label className="mb-1 block text-sm font-medium text-gray-900">{t("emailOrPhone")}</label>
             <Input value={emailOrPhone} onChange={(e) => setEmailOrPhone(e.target.value)} />
           </div>
 
-          <div>
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-x-0" 
+                : "opacity-0 -translate-x-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "200ms" : "0ms" }}
+          >
             <label className="mb-1 block text-sm font-medium text-gray-900">{t("password")}</label>
             <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
-          <Button
-            className="w-full"
-            disabled={isLoading || !emailOrPhone || !password}
-            onClick={handleLogin}
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "300ms" : "0ms" }}
           >
+            <Button
+              className="w-full"
+              disabled={isLoading || !emailOrPhone || !password}
+              onClick={handleLogin}
+            >
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <Spinner /> {t("loggingIn")}
@@ -89,7 +145,8 @@ export default function LoginPage() {
             ) : (
               t("login")
             )}
-          </Button>
+            </Button>
+          </div>
 
           {error ? (
             <p className="text-sm text-red-600">

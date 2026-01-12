@@ -1,6 +1,7 @@
 import "./globals.css";
 import Providers from "./providers";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 export const metadata = {
   title: "Greenhouse Marketplace",
@@ -10,10 +11,11 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="modern-bg min-h-screen text-gray-900" suppressHydrationWarning>
+      <body className="modern-bg min-h-screen text-gray-900 flex flex-col" suppressHydrationWarning>
         <Providers>
           <Header />
-          <main className="py-8">{children}</main>
+          <main className="py-4 sm:py-6 md:py-8 flex-1">{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>

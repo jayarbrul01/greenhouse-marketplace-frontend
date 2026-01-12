@@ -59,7 +59,7 @@ function VerifyEmailContent() {
   };
 
   return (
-    <Container className="max-w-md">
+    <Container className="max-w-md mx-auto px-4 sm:px-6">
       <Card title={t("verifyEmail")}>
         <div className="space-y-4">
           <p className="text-sm text-gray-900">
@@ -128,7 +128,7 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
-      <Container className="max-w-md">
+      <Container className="max-w-md mx-auto px-4 sm:px-6">
         <Card title="Loading...">
           <div className="flex items-center justify-center py-8">
             <Spinner />

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Container } from "@/components/layout/Container";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -27,6 +28,11 @@ export default function SignUpPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const toggleRole = (role: string) => {
     setRoles((prev) =>
@@ -87,10 +93,41 @@ export default function SignUpPage() {
   };
 
   return (
-    <Container className="max-w-md">
-      <Card title={t("signUp")}>
+    <Container className="max-w-md mx-auto px-4 sm:px-6">
+      <Card 
+        className={`
+          transition-all duration-500 ease-out
+          ${isMounted 
+            ? "opacity-100 translate-y-0 scale-100" 
+            : "opacity-0 translate-y-4 scale-95"
+          }
+        `}
+      >
+        <div className="flex items-center justify-center">
+          <Image
+            src="/logo_2.png"
+            alt={t("appName")}
+            width={80}
+            height={80}
+            className="h-16 w-16 sm:h-20 sm:w-20 object-contain"
+            priority
+            unoptimized
+          />
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            {t("signUp")}
+          </h2>
+        </div>
         <div className="space-y-4">
-          <div>
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-x-0" 
+                : "opacity-0 -translate-x-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "100ms" : "0ms" }}
+          >
             <label className="mb-1 block text-sm font-medium text-gray-900">{t("email")}</label>
             <Input
               type="email"
@@ -100,7 +137,16 @@ export default function SignUpPage() {
             />
           </div>
 
-          <div>
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-x-0" 
+                : "opacity-0 -translate-x-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "150ms" : "0ms" }}
+          >
             <label className="mb-1 block text-sm font-medium text-gray-900">{t("phone")}</label>
             <Input
               type="tel"
@@ -110,7 +156,16 @@ export default function SignUpPage() {
             />
           </div>
 
-          <div>
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-x-0" 
+                : "opacity-0 -translate-x-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "200ms" : "0ms" }}
+          >
             <label className="mb-1 block text-sm font-medium text-gray-900">{t("password")}</label>
             <Input
               type="password"
@@ -120,7 +175,16 @@ export default function SignUpPage() {
             />
           </div>
 
-          <div>
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-x-0" 
+                : "opacity-0 -translate-x-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "250ms" : "0ms" }}
+          >
             <label className="mb-1 block text-sm font-medium text-gray-900">{t("confirmPassword")}</label>
             <Input
               type="password"
@@ -133,7 +197,16 @@ export default function SignUpPage() {
             )}
           </div>
 
-          <div>
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-x-0" 
+                : "opacity-0 -translate-x-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "300ms" : "0ms" }}
+          >
             <label className="mb-2 block text-sm font-medium text-gray-900">{t("selectRole")}</label>
             <div className="space-y-2">
               {["BUYER", "SELLER", "WISHLIST"].map((role) => (
@@ -153,19 +226,29 @@ export default function SignUpPage() {
             )}
           </div>
 
-          <Button
-            className="w-full"
-            disabled={
-              isLoading ||
-              !email ||
-              !phone ||
-              !password ||
-              !confirmPassword ||
-              password !== confirmPassword ||
-              roles.length === 0
-            }
-            onClick={handleSubmit}
+          <div
+            className={`
+              transition-all duration-500 ease-out
+              ${isMounted 
+                ? "opacity-100 translate-y-0" 
+                : "opacity-0 translate-y-4"
+              }
+            `}
+            style={{ transitionDelay: isMounted ? "400ms" : "0ms" }}
           >
+            <Button
+              className="w-full"
+              disabled={
+                isLoading ||
+                !email ||
+                !phone ||
+                !password ||
+                !confirmPassword ||
+                password !== confirmPassword ||
+                roles.length === 0
+              }
+              onClick={handleSubmit}
+            >
             {isLoading ? (
               <span className="flex items-center gap-2">
                 <Spinner /> {t("creatingAccount")}
@@ -173,7 +256,8 @@ export default function SignUpPage() {
             ) : (
               t("signUp")
             )}
-          </Button>
+            </Button>
+          </div>
 
           {error ? (
             <p className="text-sm text-red-600">
