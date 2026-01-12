@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #1f2937 !important;
+}
+
+/* Modern gradient background - always light and modern */
+.modern-bg {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+  position: relative;
+  min-height: 100vh;
+  color: #1f2937 !important;
+}
+
+.modern-bg * {
+  color: inherit;
+}
+
+.modern-bg h1,
+.modern-bg h2,
+.modern-bg h3,
+.modern-bg h4,
+.modern-bg h5,
+.modern-bg h6 {
+  color: #111827 !important;
+}
+
+.modern-bg p,
+.modern-bg span,
+.modern-bg label,
+.modern-bg div {
+  color: #1f2937 !important;
+}
+
+.modern-bg::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.modern-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hide Next.js dev indicator */
+[data-nextjs-toast],
+[data-nextjs-dialog],
+.__next-build-indicator,
+#__next-build-indicator,
+[class*="__next-build-indicator"],
+[class*="nextjs-toast"],
+[class*="nextjs-dialog"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
