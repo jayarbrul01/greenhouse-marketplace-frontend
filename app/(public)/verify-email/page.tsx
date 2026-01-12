@@ -12,6 +12,7 @@ import { useVerifyEmailMutation } from "@/store/api/auth.api";
 import { setAccessToken } from "@/lib/auth";
 import { useAppDispatch } from "@/store/hooks";
 import { loginSuccess } from "@/store/slices/auth.slice";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 function VerifyEmailContent() {
   const [code, setCode] = useState("");
@@ -21,6 +22,7 @@ function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Get dev code and email from URL params (set after registration)
@@ -58,7 +60,7 @@ function VerifyEmailContent() {
 
   return (
     <Container className="max-w-md">
-      <Card title="Verify Your Email">
+      <Card title={t("verifyEmail")}>
         <div className="space-y-4">
           <p className="text-sm text-gray-900">
             {email
@@ -77,13 +79,13 @@ function VerifyEmailContent() {
 
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-900">
-              Verification Code
+              {t("verificationCode")}
             </label>
             <Input
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 10))}
-              placeholder="Enter 6-digit code"
+              placeholder={t("enterCode")}
               maxLength={10}
               className="text-center text-2xl font-mono tracking-widest"
             />
@@ -96,10 +98,10 @@ function VerifyEmailContent() {
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <Spinner /> Verifying...
+                <Spinner /> {t("verifying")}
               </span>
             ) : (
-              "Verify Email"
+              t("verify")
             )}
           </Button>
 
@@ -112,9 +114,9 @@ function VerifyEmailContent() {
           ) : null}
 
           <p className="text-center text-sm text-gray-900">
-            Didn't receive a code?{" "}
+            {t("didntReceiveCode")}{" "}
             <Link href="/login" className="font-medium text-green-700 hover:underline">
-              Go to Login
+              {t("goToLogin")}
             </Link>
           </p>
         </div>
@@ -127,7 +129,7 @@ export default function VerifyEmailPage() {
   return (
     <Suspense fallback={
       <Container className="max-w-md">
-        <Card title="Verify Your Email">
+        <Card title="Loading...">
           <div className="flex items-center justify-center py-8">
             <Spinner />
           </div>

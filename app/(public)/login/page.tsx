@@ -13,6 +13,7 @@ import { setAccessToken } from "@/lib/auth";
 import { useAppDispatch } from "@/store/hooks";
 import { loginSuccess } from "@/store/slices/auth.slice";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { CredentialResponse } from "@react-oauth/google";
 
 export default function LoginPage() {
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [googleAuth, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     if (!credentialResponse.credential) {
@@ -63,15 +65,15 @@ export default function LoginPage() {
 
   return (
     <Container className="max-w-md">
-      <Card title="Login">
+      <Card title={t("login")}>
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">Email or Phone</label>
+            <label className="mb-1 block text-sm font-medium text-gray-900">{t("emailOrPhone")}</label>
             <Input value={emailOrPhone} onChange={(e) => setEmailOrPhone(e.target.value)} />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">Password</label>
+            <label className="mb-1 block text-sm font-medium text-gray-900">{t("password")}</label>
             <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
@@ -82,10 +84,10 @@ export default function LoginPage() {
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <Spinner /> Logging in...
+                <Spinner /> {t("loggingIn")}
               </span>
             ) : (
-              "Login"
+              t("login")
             )}
           </Button>
 
@@ -96,9 +98,9 @@ export default function LoginPage() {
           ) : null}
 
           <p className="text-center text-sm text-gray-900">
-            Don't have an account?{" "}
+            {t("dontHaveAccount")}{" "}
             <Link href="/signup" className="font-medium text-green-700 hover:underline">
-              Sign Up
+              {t("signUp")}
             </Link>
           </p>
 
@@ -107,7 +109,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white text-gray-500">{t("orContinueWith")}</span>
             </div>
           </div>
 

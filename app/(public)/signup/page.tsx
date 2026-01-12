@@ -13,6 +13,7 @@ import { setAccessToken } from "@/lib/auth";
 import { useAppDispatch } from "@/store/hooks";
 import { loginSuccess } from "@/store/slices/auth.slice";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { CredentialResponse } from "@react-oauth/google";
 
 export default function SignUpPage() {
@@ -25,6 +26,7 @@ export default function SignUpPage() {
   const [googleAuth, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
 
   const toggleRole = (role: string) => {
     setRoles((prev) =>
@@ -78,12 +80,18 @@ export default function SignUpPage() {
     }
   };
 
+  const roleLabels: Record<string, string> = {
+    BUYER: t("buyer"),
+    SELLER: t("seller"),
+    WISHLIST: t("wishlist"),
+  };
+
   return (
     <Container className="max-w-md">
-      <Card title="Sign Up">
+      <Card title={t("signUp")}>
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">Email</label>
+            <label className="mb-1 block text-sm font-medium text-gray-900">{t("email")}</label>
             <Input
               type="email"
               value={email}
@@ -93,7 +101,7 @@ export default function SignUpPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">Phone</label>
+            <label className="mb-1 block text-sm font-medium text-gray-900">{t("phone")}</label>
             <Input
               type="tel"
               value={phone}
@@ -103,7 +111,7 @@ export default function SignUpPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">Password</label>
+            <label className="mb-1 block text-sm font-medium text-gray-900">{t("password")}</label>
             <Input
               type="password"
               value={password}
@@ -113,7 +121,7 @@ export default function SignUpPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">Confirm Password</label>
+            <label className="mb-1 block text-sm font-medium text-gray-900">{t("confirmPassword")}</label>
             <Input
               type="password"
               value={confirmPassword}
@@ -121,12 +129,12 @@ export default function SignUpPage() {
               placeholder="Re-enter your password"
             />
             {password && confirmPassword && password !== confirmPassword && (
-              <p className="mt-1 text-xs text-red-600">Passwords do not match</p>
+              <p className="mt-1 text-xs text-red-600">{t("passwordsDoNotMatch")}</p>
             )}
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-900">Select Your Role(s)</label>
+            <label className="mb-2 block text-sm font-medium text-gray-900">{t("selectRole")}</label>
             <div className="space-y-2">
               {["BUYER", "SELLER", "WISHLIST"].map((role) => (
                 <label key={role} className="flex items-center gap-2 cursor-pointer">
@@ -136,12 +144,12 @@ export default function SignUpPage() {
                     onChange={() => toggleRole(role)}
                     className="rounded border-gray-300 text-green-600 focus:ring-green-600"
                   />
-                  <span className="text-sm capitalize text-gray-900">{role.toLowerCase()}</span>
+                  <span className="text-sm text-gray-900">{roleLabels[role]}</span>
                 </label>
               ))}
             </div>
             {roles.length === 0 && (
-              <p className="mt-1 text-xs text-red-600">Please select at least one role</p>
+              <p className="mt-1 text-xs text-red-600">{t("pleaseSelectRole")}</p>
             )}
           </div>
 
@@ -160,10 +168,10 @@ export default function SignUpPage() {
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <Spinner /> Creating account...
+                <Spinner /> {t("creatingAccount")}
               </span>
             ) : (
-              "Sign Up"
+              t("signUp")
             )}
           </Button>
 
@@ -176,9 +184,9 @@ export default function SignUpPage() {
           ) : null}
 
           <p className="text-center text-sm text-gray-900">
-            Already have an account?{" "}
+            {t("alreadyHaveAccount")}{" "}
             <Link href="/login" className="font-medium text-green-700 hover:underline">
-              Login
+              {t("login")}
             </Link>
           </p>
 
@@ -187,7 +195,7 @@ export default function SignUpPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white text-gray-500">{t("orContinueWith")}</span>
             </div>
           </div>
 
