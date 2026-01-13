@@ -45,13 +45,13 @@ export default function LoginPage() {
 
       toast.success("Signed in with Google successfully!");
 
-      // Google emails are pre-verified, so go directly to dashboard
+      // Google emails are pre-verified, so go directly to profile
       dispatch(
         loginSuccess({
           user: { email: result.user.email, name: firebaseUser.name || result.user.email },
         })
       );
-      router.push("/dashboard");
+      router.push("/profile");
     } catch (err: any) {
       console.error("Google auth failed:", err);
       const errorMessage = err.data?.message || err.message || "Google sign-in failed. Please try again.";
@@ -71,7 +71,7 @@ export default function LoginPage() {
       toast.success("Logged in successfully!");
       // Small delay to ensure state is updated
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/profile");
       }, 100);
     } catch (error: any) {
       console.error("Login failed:", error);

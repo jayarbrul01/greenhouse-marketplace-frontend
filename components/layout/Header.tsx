@@ -59,6 +59,15 @@ export function Header() {
             {t("listings")}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
           </Link>
+          {isAuthenticated && (
+            <Link 
+              className="text-md font-medium text-gray-700 hover:text-green-600 transition-colors duration-200 relative group" 
+              href="/profile"
+            >
+              Profile
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+            </Link>
+          )}
           <Link 
             className="text-md font-medium text-gray-700 hover:text-green-600 transition-colors duration-200 relative group" 
             href="/dashboard"
@@ -141,6 +150,15 @@ export function Header() {
             >
               {t("listings")}
             </Link>
+            {isAuthenticated && (
+              <Link
+                href="/profile"
+                className="block text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-white/50 rounded-lg px-3 py-2.5 transition-all duration-200"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Profile
+              </Link>
+            )}
             <Link
               href="/dashboard"
               className="block text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-white/50 rounded-lg px-3 py-2.5 transition-all duration-200"

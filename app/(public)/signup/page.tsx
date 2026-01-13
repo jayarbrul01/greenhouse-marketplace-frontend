@@ -77,14 +77,14 @@ export default function SignUpPage() {
 
       toast.success("Account created successfully!");
 
-      // If email is already verified, go to dashboard, otherwise go to verification page
+      // If email is already verified, go to profile, otherwise go to verification page
       if (result.user.emailVerified) {
         dispatch(
           loginSuccess({
             user: { email: result.user.email, name: result.user.email },
           })
         );
-        router.push("/dashboard");
+        router.push("/profile");
       } else {
         // Redirect to verification page
         const params = new URLSearchParams();
@@ -126,13 +126,13 @@ export default function SignUpPage() {
 
       toast.success("Signed in with Google successfully!");
 
-      // Google emails are pre-verified, so go directly to dashboard
+      // Google emails are pre-verified, so go directly to profile
       dispatch(
         loginSuccess({
           user: { email: result.user.email, name: firebaseUser.name || result.user.email },
         })
       );
-      router.push("/dashboard");
+      router.push("/profile");
     } catch (err: any) {
       console.error("Google auth failed:", err);
       const errorMessage = err.data?.message || err.message || "Google sign-in failed. Please try again.";

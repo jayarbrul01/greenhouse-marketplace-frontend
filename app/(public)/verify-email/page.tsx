@@ -62,7 +62,7 @@ function VerifyEmailContent() {
       }
       // Small delay to show success message
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/profile");
       }, 1500);
     }
   }, [verificationData, email, dispatch, router]);
@@ -88,7 +88,7 @@ function VerifyEmailContent() {
             })
           );
         }
-        router.push("/dashboard");
+        router.push("/profile");
       } else {
         toast.error("Email not yet verified. Please check your email and click the verification link.");
       }
@@ -134,7 +134,7 @@ function VerifyEmailContent() {
           {verificationData?.emailVerified && (
             <div className="rounded-lg border-2 border-green-500 bg-green-50 p-4">
               <p className="text-sm font-semibold text-green-900">
-                ✓ Email verified successfully! Redirecting to dashboard...
+                ✓ Email verified successfully! Redirecting to profile...
               </p>
             </div>
           )}
