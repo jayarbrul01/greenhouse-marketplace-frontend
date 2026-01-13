@@ -32,6 +32,7 @@ export type VerifyEmailResponse = {
   ok: boolean;
 };
 
+
 export type GoogleAuthRequest = {
   idToken: string;
 };
@@ -41,6 +42,28 @@ export type GoogleAuthResponse = {
   accessToken: string;
   refreshToken: string;
   isNewUser: boolean;
+};
+
+export type FirebaseAuthRequest = {
+  idToken: string;
+  phone?: string;
+  roles?: string[];
+};
+
+export type FirebaseAuthResponse = {
+  user: { id: string; email: string; phone: string; roles: string[]; emailVerified: boolean };
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+};
+
+export type CheckFirebaseVerificationRequest = {
+  idToken: string;
+};
+
+export type CheckFirebaseVerificationResponse = {
+  emailVerified: boolean;
+  message: string;
 };
 
 export const authApi = api.injectEndpoints({
@@ -77,7 +100,23 @@ export const authApi = api.injectEndpoints({
         headers: { "content-type": "application/json" },
       }),
     }),
+    firebaseAuth: builder.mutation<FirebaseAuthResponse, FirebaseAuthRequest>({
+      query: (body) => ({
+        url: "/auth/firebase",
+        method: "POST",
+        body,
+        headers: { "content-type": "application/json" },
+      }),
+    }),
+    checkFirebaseVerification: builder.mutation<CheckFirebaseVerificationResponse, CheckFirebaseVerificationRequest>({
+      query: (body) => ({
+        url: "/auth/check-firebase-verification",
+        method: "POST",
+        body,
+        headers: { "content-type": "application/json" },
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useVerifyEmailMutation, useGoogleAuthMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useVerifyEmailMutation, useGoogleAuthMutation, useFirebaseAuthMutation, useCheckFirebaseVerificationMutation } = authApi;

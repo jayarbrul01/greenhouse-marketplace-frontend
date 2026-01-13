@@ -9,13 +9,15 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
-import { useRegisterMutation, useGoogleAuthMutation } from "@/store/api/auth.api";
+import { useRegisterMutation, useGoogleAuthMutation, useFirebaseAuthMutation } from "@/store/api/auth.api";
 import { setAccessToken } from "@/lib/auth";
 import { useAppDispatch } from "@/store/hooks";
 import { loginSuccess } from "@/store/slices/auth.slice";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { CredentialResponse } from "@react-oauth/google";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -25,10 +27,12 @@ export default function SignUpPage() {
   const [roles, setRoles] = useState<string[]>([]);
   const [register, { isLoading, error }] = useRegisterMutation();
   const [googleAuth, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
+  const [firebaseAuth, { isLoading: isFirebaseLoading }] = useFirebaseAuthMutation();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
   const [isMounted, setIsMounted] = useState(false);
+  const [firebaseError, setFirebaseError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -48,21 +52,52 @@ export default function SignUpPage() {
       return;
     }
 
+    setFirebaseError(null);
+
     try {
-      const result = await register({ email, phone, password, roles }).unwrap();
-      // Store the access token for verification endpoint (requires auth)
+      // Step 1: Create user in Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+
+      // Step 2: Send Firebase email verification
+      if (!firebaseUser.emailVerified) {
+        await sendEmailVerification(firebaseUser);
+      }
+
+      // Step 3: Get ID token and save user data to backend database
+      const idToken = await firebaseUser.getIdToken();
+      const result = await firebaseAuth({ 
+        idToken, 
+        phone, 
+        roles 
+      }).unwrap();
+
+      // Store the access token
       if (result.accessToken) {
         setAccessToken(result.accessToken);
       }
-      // Redirect to verification page with dev code (if available)
-      const params = new URLSearchParams();
-      if (result.devVerification?.emailCode) {
-        params.set("devCode", result.devVerification.emailCode);
+
+      // If email is already verified, go to dashboard, otherwise go to verification page
+      if (result.user.emailVerified) {
+        dispatch(
+          loginSuccess({
+            user: { email: result.user.email, name: result.user.email },
+          })
+        );
+        router.push("/dashboard");
+      } else {
+        // Redirect to verification page
+        const params = new URLSearchParams();
+        params.set("email", result.user.email);
+        router.push(`/verify-email?${params.toString()}`);
       }
-      params.set("email", result.user.email);
-      router.push(`/verify-email?${params.toString()}`);
-    } catch (err) {
-      // Error is handled by the mutation
+    } catch (err: any) {
+      console.error("Firebase signup failed:", err);
+      setFirebaseError(
+        err.code === "auth/email-already-in-use"
+          ? "Email is already registered. Please use login instead."
+          : err.message || "Sign up failed. Please try again."
+      );
     }
   };
 
@@ -240,6 +275,7 @@ export default function SignUpPage() {
               className="w-full"
               disabled={
                 isLoading ||
+                isFirebaseLoading ||
                 !email ||
                 !phone ||
                 !password ||
@@ -249,7 +285,7 @@ export default function SignUpPage() {
               }
               onClick={handleSubmit}
             >
-            {isLoading ? (
+            {isLoading || isFirebaseLoading ? (
               <span className="flex items-center gap-2">
                 <Spinner /> {t("creatingAccount")}
               </span>
@@ -265,6 +301,10 @@ export default function SignUpPage() {
                 ? String(error.data.message)
                 : "Sign up failed. Please try again."}
             </p>
+          ) : null}
+
+          {firebaseError ? (
+            <p className="text-sm text-red-600">{firebaseError}</p>
           ) : null}
 
           <p className="text-center text-sm text-gray-900">
