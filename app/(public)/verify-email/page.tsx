@@ -14,11 +14,11 @@ import { loginSuccess } from "@/store/slices/auth.slice";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { auth } from "@/lib/firebase";
 import { sendEmailVerification } from "firebase/auth";
+import toast from "react-hot-toast";
 
 function VerifyEmailContent() {
   const [email, setEmail] = useState<string | null>(null);
   const [checkVerification, { isLoading: isChecking, data: verificationData }] = useCheckFirebaseVerificationMutation();
-  const [resendMessage, setResendMessage] = useState<string | null>(null);
   const [isResending, setIsResending] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,6 +51,7 @@ function VerifyEmailContent() {
   // Auto-redirect when verified
   useEffect(() => {
     if (verificationData?.emailVerified) {
+      toast.success("Email verified successfully!");
       const token = localStorage.getItem("accessToken");
       if (token) {
         dispatch(
@@ -69,7 +70,7 @@ function VerifyEmailContent() {
   const handleCheckVerification = async () => {
     const currentUser = auth.currentUser;
     if (!currentUser) {
-      setResendMessage("Please log in first to check verification status.");
+      toast.error("Please log in first to check verification status.");
       return;
     }
 
@@ -78,6 +79,7 @@ function VerifyEmailContent() {
       const result = await checkVerification({ idToken }).unwrap();
       
       if (result.emailVerified) {
+        toast.success("Email verified successfully!");
         const token = localStorage.getItem("accessToken");
         if (token) {
           dispatch(
@@ -88,31 +90,32 @@ function VerifyEmailContent() {
         }
         router.push("/dashboard");
       } else {
-        setResendMessage("Email not yet verified. Please check your email and click the verification link.");
+        toast.error("Email not yet verified. Please check your email and click the verification link.");
       }
     } catch (err: any) {
       console.error("Check verification failed:", err);
-      setResendMessage(err.message || "Failed to check verification status. Please try again.");
+      const errorMessage = err.data?.message || err.message || "Failed to check verification status. Please try again.";
+      toast.error(errorMessage);
     }
   };
 
   const handleResend = async () => {
-    setResendMessage(null);
     setIsResending(true);
     
     try {
       const currentUser = auth.currentUser;
       if (currentUser && !currentUser.emailVerified) {
         await sendEmailVerification(currentUser);
-        setResendMessage("Verification email sent! Please check your inbox and click the verification link.");
+        toast.success("Verification email sent! Please check your inbox and click the verification link.");
       } else if (currentUser?.emailVerified) {
-        setResendMessage("Your email is already verified!");
+        toast.success("Your email is already verified!");
       } else {
-        setResendMessage("Please log in first to resend verification email.");
+        toast.error("Please log in first to resend verification email.");
       }
     } catch (err: any) {
       console.error("Resend failed:", err);
-      setResendMessage(err.message || "Failed to resend verification email. Please try again.");
+      const errorMessage = err.message || "Failed to resend verification email. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsResending(false);
     }
@@ -134,12 +137,6 @@ function VerifyEmailContent() {
                 ✓ Email verified successfully! Redirecting to dashboard...
               </p>
             </div>
-          )}
-
-          {resendMessage && (
-            <p className={`text-sm ${resendMessage.includes("already verified") || resendMessage.includes("sent") ? "text-green-600" : "text-red-600"}`}>
-              {resendMessage}
-            </p>
           )}
 
           <div className="flex flex-col gap-2">

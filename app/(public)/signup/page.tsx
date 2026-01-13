@@ -17,6 +17,7 @@ import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { auth } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import toast from "react-hot-toast";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,6 @@ export default function SignUpPage() {
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
   const [isMounted, setIsMounted] = useState(false);
-  const [firebaseError, setFirebaseError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -44,13 +44,13 @@ export default function SignUpPage() {
 
   const handleSubmit = async () => {
     if (password !== confirmPassword) {
+      toast.error(t("passwordsDoNotMatch") || "Passwords do not match");
       return;
     }
     if (roles.length === 0) {
+      toast.error(t("pleaseSelectRole") || "Please select at least one role");
       return;
     }
-
-    setFirebaseError(null);
 
     try {
       // Step 1: Create user in Firebase
@@ -75,6 +75,8 @@ export default function SignUpPage() {
         setAccessToken(result.accessToken);
       }
 
+      toast.success("Account created successfully!");
+
       // If email is already verified, go to dashboard, otherwise go to verification page
       if (result.user.emailVerified) {
         dispatch(
@@ -90,12 +92,22 @@ export default function SignUpPage() {
         router.push(`/verify-email?${params.toString()}`);
       }
     } catch (err: any) {
-      console.error("Firebase signup failed:", err);
-      setFirebaseError(
-        err.code === "auth/email-already-in-use"
-          ? "Email is already registered. Please use login instead."
-          : err.message || "Sign up failed. Please try again."
-      );
+      console.error("Firebase signup failed:", err.code);
+      let errorMessage = "Sign up failed. Please try again.";
+      
+      if (err.code === "auth/email-already-in-use") {
+        errorMessage = "Email is already registered. Please use login instead.";
+      } else if (err.code === "auth/weak-password") {
+        errorMessage = "Password is too weak. Please use a stronger password.";
+      } else if (err.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address. Please check your email.";
+      } else if (err.data?.message) {
+        errorMessage = err.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
@@ -112,6 +124,8 @@ export default function SignUpPage() {
         setAccessToken(result.accessToken);
       }
 
+      toast.success("Signed in with Google successfully!");
+
       // Google emails are pre-verified, so go directly to dashboard
       dispatch(
         loginSuccess({
@@ -121,7 +135,8 @@ export default function SignUpPage() {
       router.push("/dashboard");
     } catch (err: any) {
       console.error("Google auth failed:", err);
-      setFirebaseError(err.message || "Google sign-in failed. Please try again.");
+      const errorMessage = err.data?.message || err.message || "Google sign-in failed. Please try again.";
+      toast.error(errorMessage);
     }
   };
 
@@ -299,17 +314,6 @@ export default function SignUpPage() {
             </Button>
           </div>
 
-          {error ? (
-            <p className="text-sm text-red-600">
-              {("data" in error && typeof error.data === "object" && error.data !== null && "message" in error.data)
-                ? String(error.data.message)
-                : "Sign up failed. Please try again."}
-            </p>
-          ) : null}
-
-          {firebaseError ? (
-            <p className="text-sm text-red-600">{firebaseError}</p>
-          ) : null}
 
           <p className="text-center text-sm text-gray-900">
             {t("alreadyHaveAccount")}{" "}

@@ -15,24 +15,23 @@ import { useAppDispatch } from "@/store/hooks";
 import { loginSuccess } from "@/store/slices/auth.slice";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { useLanguage } from "@/contexts/LanguageContext";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const [firebaseAuth, { isLoading: isFirebaseLoading }] = useFirebaseAuthMutation();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
   const [isMounted, setIsMounted] = useState(false);
-  const [googleError, setGoogleError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   const handleGoogleSuccess = async (idToken: string, firebaseUser: { email: string; name?: string; emailVerified: boolean }) => {
-    setGoogleError(null);
     try {
       // Save/update user data in backend database using Firebase auth endpoint
       const result = await firebaseAuth({ 
@@ -44,6 +43,8 @@ export default function LoginPage() {
         setAccessToken(result.accessToken);
       }
 
+      toast.success("Signed in with Google successfully!");
+
       // Google emails are pre-verified, so go directly to dashboard
       dispatch(
         loginSuccess({
@@ -53,7 +54,8 @@ export default function LoginPage() {
       router.push("/dashboard");
     } catch (err: any) {
       console.error("Google auth failed:", err);
-      setGoogleError(err.message || "Google sign-in failed. Please try again.");
+      const errorMessage = err.data?.message || err.message || "Google sign-in failed. Please try again.";
+      toast.error(errorMessage);
     }
   };
 
@@ -66,12 +68,15 @@ export default function LoginPage() {
           user: { email: res.user.email, name: res.user.fullName },
         })
       );
+      toast.success("Logged in successfully!");
       // Small delay to ensure state is updated
       setTimeout(() => {
         router.push("/dashboard");
       }, 100);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed:", error);
+      const errorMessage = error.data?.message || error.message || "Login failed. Please check your credentials.";
+      toast.error(errorMessage);
     }
   };
 
@@ -154,15 +159,6 @@ export default function LoginPage() {
             </Button>
           </div>
 
-          {error ? (
-            <p className="text-sm text-red-600">
-              Login failed. Check your credentials and `NEXT_PUBLIC_API_URL`.
-            </p>
-          ) : null}
-
-          {googleError ? (
-            <p className="text-sm text-red-600">{googleError}</p>
-          ) : null}
 
           <p className="text-center text-sm text-gray-900">
             {t("dontHaveAccount")}{" "}
@@ -182,7 +178,7 @@ export default function LoginPage() {
 
           <GoogleLoginButton
             onSuccess={handleGoogleSuccess}
-            onError={(error) => setGoogleError(error.message || "Google sign-in failed")}
+            onError={(error) => toast.error(error.message || "Google sign-in failed")}
             isLoading={isFirebaseLoading}
           />
         </div>
