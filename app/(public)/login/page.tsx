@@ -9,45 +9,51 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
-import { useLoginMutation, useGoogleAuthMutation } from "@/store/api/auth.api";
+import { useLoginMutation, useFirebaseAuthMutation } from "@/store/api/auth.api";
 import { setAccessToken } from "@/lib/auth";
 import { useAppDispatch } from "@/store/hooks";
 import { loginSuccess } from "@/store/slices/auth.slice";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { useLanguage } from "@/contexts/LanguageContext";
-import type { CredentialResponse } from "@react-oauth/google";
 
 export default function LoginPage() {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [login, { isLoading, error }] = useLoginMutation();
-  const [googleAuth, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
+  const [firebaseAuth, { isLoading: isFirebaseLoading }] = useFirebaseAuthMutation();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
   const [isMounted, setIsMounted] = useState(false);
+  const [googleError, setGoogleError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
-    if (!credentialResponse.credential) {
-      console.error("No credential received from Google");
-      return;
-    }
-
+  const handleGoogleSuccess = async (idToken: string, firebaseUser: { email: string; name?: string; emailVerified: boolean }) => {
+    setGoogleError(null);
     try {
-      const res = await googleAuth({ idToken: credentialResponse.credential }).unwrap();
-      setAccessToken(res.accessToken);
+      // Save/update user data in backend database using Firebase auth endpoint
+      const result = await firebaseAuth({ 
+        idToken
+      }).unwrap();
+
+      // Store the access token
+      if (result.accessToken) {
+        setAccessToken(result.accessToken);
+      }
+
+      // Google emails are pre-verified, so go directly to dashboard
       dispatch(
         loginSuccess({
-          user: { email: res.user.email, name: res.user.email },
+          user: { email: result.user.email, name: firebaseUser.name || result.user.email },
         })
       );
       router.push("/dashboard");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Google auth failed:", err);
+      setGoogleError(err.message || "Google sign-in failed. Please try again.");
     }
   };
 
@@ -154,6 +160,10 @@ export default function LoginPage() {
             </p>
           ) : null}
 
+          {googleError ? (
+            <p className="text-sm text-red-600">{googleError}</p>
+          ) : null}
+
           <p className="text-center text-sm text-gray-900">
             {t("dontHaveAccount")}{" "}
             <Link href="/signup" className="font-medium text-green-700 hover:underline">
@@ -172,7 +182,8 @@ export default function LoginPage() {
 
           <GoogleLoginButton
             onSuccess={handleGoogleSuccess}
-            isLoading={isGoogleLoading}
+            onError={(error) => setGoogleError(error.message || "Google sign-in failed")}
+            isLoading={isFirebaseLoading}
           />
         </div>
       </Card>

@@ -9,13 +9,12 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
-import { useRegisterMutation, useGoogleAuthMutation, useFirebaseAuthMutation } from "@/store/api/auth.api";
+import { useRegisterMutation, useFirebaseAuthMutation } from "@/store/api/auth.api";
 import { setAccessToken } from "@/lib/auth";
 import { useAppDispatch } from "@/store/hooks";
 import { loginSuccess } from "@/store/slices/auth.slice";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
 import { useLanguage } from "@/contexts/LanguageContext";
-import type { CredentialResponse } from "@react-oauth/google";
 import { auth } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 
@@ -26,7 +25,6 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [roles, setRoles] = useState<string[]>([]);
   const [register, { isLoading, error }] = useRegisterMutation();
-  const [googleAuth, { isLoading: isGoogleLoading }] = useGoogleAuthMutation();
   const [firebaseAuth, { isLoading: isFirebaseLoading }] = useFirebaseAuthMutation();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -101,23 +99,29 @@ export default function SignUpPage() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
-    if (!credentialResponse.credential) {
-      console.error("No credential received from Google");
-      return;
-    }
-
+  const handleGoogleSuccess = async (idToken: string, firebaseUser: { email: string; name?: string; emailVerified: boolean }) => {
     try {
-      const res = await googleAuth({ idToken: credentialResponse.credential }).unwrap();
-      setAccessToken(res.accessToken);
+      // Save user data to backend database using Firebase auth endpoint
+      const result = await firebaseAuth({ 
+        idToken,
+        roles: ["BUYER"] // Default role for Google signups
+      }).unwrap();
+
+      // Store the access token
+      if (result.accessToken) {
+        setAccessToken(result.accessToken);
+      }
+
+      // Google emails are pre-verified, so go directly to dashboard
       dispatch(
         loginSuccess({
-          user: { email: res.user.email, name: res.user.email },
+          user: { email: result.user.email, name: firebaseUser.name || result.user.email },
         })
       );
       router.push("/dashboard");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Google auth failed:", err);
+      setFirebaseError(err.message || "Google sign-in failed. Please try again.");
     }
   };
 
@@ -325,7 +329,7 @@ export default function SignUpPage() {
 
           <GoogleLoginButton
             onSuccess={handleGoogleSuccess}
-            isLoading={isGoogleLoading}
+            isLoading={isFirebaseLoading}
           />
         </div>
       </Card>
