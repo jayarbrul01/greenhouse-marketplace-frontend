@@ -66,6 +66,16 @@ export type CheckFirebaseVerificationResponse = {
   message: string;
 };
 
+export type CheckFirebasePhoneVerificationRequest = {
+  idToken: string;
+};
+
+export type CheckFirebasePhoneVerificationResponse = {
+  phoneVerified: boolean;
+  phoneNumber: string;
+  message: string;
+};
+
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
@@ -116,7 +126,15 @@ export const authApi = api.injectEndpoints({
         headers: { "content-type": "application/json" },
       }),
     }),
+    checkFirebasePhoneVerification: builder.mutation<CheckFirebasePhoneVerificationResponse, CheckFirebasePhoneVerificationRequest>({
+      query: (body) => ({
+        url: "/auth/check-firebase-phone-verification",
+        method: "POST",
+        body,
+        headers: { "content-type": "application/json" },
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useVerifyEmailMutation, useGoogleAuthMutation, useFirebaseAuthMutation, useCheckFirebaseVerificationMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useVerifyEmailMutation, useGoogleAuthMutation, useFirebaseAuthMutation, useCheckFirebaseVerificationMutation, useCheckFirebasePhoneVerificationMutation } = authApi;
