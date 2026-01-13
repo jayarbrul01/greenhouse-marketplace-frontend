@@ -39,7 +39,6 @@ export default function ProfilePage() {
   // Preferences state
   const [notifyEmail, setNotifyEmail] = useState(true);
   const [notifySms, setNotifySms] = useState(false);
-  const [notifyInApp, setNotifyInApp] = useState(true);
 
   // Initialize form with profile data
   useEffect(() => {
@@ -49,7 +48,6 @@ export default function ProfilePage() {
       setPreferredLanguage(profile.preferredLanguage as "en" | "es" | "fr" || "en");
       setNotifyEmail(profile.notifyEmail);
       setNotifySms(profile.notifySms);
-      setNotifyInApp(profile.notifyInApp);
       setPhoneNumber(profile.phone || "");
     }
   }, [profile]);
@@ -95,7 +93,6 @@ export default function ProfilePage() {
       await updatePreferences({
         notifyEmail,
         notifySms,
-        notifyInApp,
       }).unwrap();
       toast.success("Preferences updated successfully!");
       refetch();
@@ -396,16 +393,6 @@ export default function ProfilePage() {
                 className="rounded border-gray-300 text-green-600 focus:ring-green-600"
               />
               <span className="text-sm text-gray-900">SMS Notifications</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={notifyInApp}
-                onChange={(e) => setNotifyInApp(e.target.checked)}
-                className="rounded border-gray-300 text-green-600 focus:ring-green-600"
-              />
-              <span className="text-sm text-gray-900">In-App Notifications</span>
             </label>
 
             <Button
