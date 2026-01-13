@@ -253,7 +253,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <Container>
-        <Card title="Profile">
+        <Card title={t("profile")}>
           <div className="flex items-center justify-center py-8">
             <Spinner />
           </div>
@@ -265,7 +265,7 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <Container>
-        <Card title="Profile">
+        <Card title={t("profile")}>
           <p className="text-sm text-red-600">Failed to load profile.</p>
         </Card>
       </Container>
@@ -276,10 +276,10 @@ export default function ProfilePage() {
     <Container>
       <div className="space-y-6">
         {/* Profile Information */}
-        <Card title="Profile Information">
+        <Card title={t("profileInformation")}>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">Email</label>
+              <label className="mb-1 block text-sm font-medium text-gray-900">{t("email")}</label>
               <Input
                 type="email"
                 value={profile.email}
@@ -288,15 +288,15 @@ export default function ProfilePage() {
               />
               <p className="mt-1 text-xs text-gray-500">
                 {profile.emailVerified ? (
-                  <span className="text-green-600">✓ Email verified</span>
+                  <span className="text-green-600">✓ {t("emailVerified")}</span>
                 ) : (
-                  <span className="text-red-600">✗ Email not verified</span>
+                  <span className="text-red-600">✗ {t("emailNotVerified")}</span>
                 )}
               </p>
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">Phone</label>
+              <label className="mb-1 block text-sm font-medium text-gray-900">{t("phone")}</label>
               <div className="flex gap-2">
                 <Input
                   type="tel"
@@ -310,49 +310,49 @@ export default function ProfilePage() {
                     size="sm"
                     onClick={handleOpenPhoneModal}
                   >
-                    Verify Phone
+                    {t("verifyPhone")}
                   </Button>
                 )}
               </div>
               <p className="mt-1 text-xs text-gray-500">
                 {profile.phoneVerified ? (
-                  <span className="text-green-600">✓ Phone verified</span>
+                  <span className="text-green-600">✓ {t("phoneVerified")}</span>
                 ) : (
-                  <span className="text-red-600">✗ Phone not verified</span>
+                  <span className="text-red-600">✗ {t("phoneNotVerified")}</span>
                 )}
               </p>
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">Full Name</label>
+              <label className="mb-1 block text-sm font-medium text-gray-900">{t("fullName")}</label>
               <Input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
+                placeholder={t("enterFullName")}
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">Region</label>
+              <label className="mb-1 block text-sm font-medium text-gray-900">{t("region")}</label>
               <Input
                 type="text"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                placeholder="Enter your region"
+                placeholder={t("enterRegion")}
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">Preferred Language</label>
+              <label className="mb-1 block text-sm font-medium text-gray-900">{t("preferredLanguage")}</label>
               <select
                 value={preferredLanguage}
                 onChange={(e) => setPreferredLanguage(e.target.value as "en" | "es" | "fr")}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600"
               >
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="fr">Français</option>
+                <option value="en">{t("english")}</option>
+                <option value="es">{t("spanish")}</option>
+                <option value="fr">{t("french")}</option>
               </select>
             </div>
 
@@ -363,17 +363,17 @@ export default function ProfilePage() {
             >
               {isUpdatingProfile ? (
                 <span className="flex items-center gap-2">
-                  <Spinner /> Updating...
+                  <Spinner /> {t("updating")}
                 </span>
               ) : (
-                "Update Profile"
+                t("updateProfile")
               )}
             </Button>
           </div>
         </Card>
 
         {/* Notification Preferences */}
-        <Card title="Notification Preferences">
+        <Card title={t("notificationPreferences")}>
           <div className="space-y-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -382,7 +382,7 @@ export default function ProfilePage() {
                 onChange={(e) => setNotifyEmail(e.target.checked)}
                 className="rounded border-gray-300 text-green-600 focus:ring-green-600"
               />
-              <span className="text-sm text-gray-900">Email Notifications</span>
+              <span className="text-sm text-gray-900">{t("emailNotifications")}</span>
             </label>
 
             <label className="flex items-center gap-2 cursor-pointer">
@@ -392,7 +392,7 @@ export default function ProfilePage() {
                 onChange={(e) => setNotifySms(e.target.checked)}
                 className="rounded border-gray-300 text-green-600 focus:ring-green-600"
               />
-              <span className="text-sm text-gray-900">SMS Notifications</span>
+              <span className="text-sm text-gray-900">{t("smsNotifications")}</span>
             </label>
 
             <Button
@@ -403,10 +403,10 @@ export default function ProfilePage() {
             >
               {isUpdatingPrefs ? (
                 <span className="flex items-center gap-2">
-                  <Spinner /> Updating...
+                  <Spinner /> {t("updating")}
                 </span>
               ) : (
-                "Update Preferences"
+                t("updatePreferences")
               )}
             </Button>
           </div>
@@ -418,14 +418,14 @@ export default function ProfilePage() {
       <Modal
         isOpen={isPhoneModalOpen}
         onClose={() => setIsPhoneModalOpen(false)}
-        title="Verify Phone Number"
+        title={t("verifyPhoneNumber")}
       >
         <div className="space-y-4">
           {phoneVerificationStep === "idle" && (
             <>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-900">
-                  Phone Number
+                  {t("phoneNumber")}
                 </label>
                 <PhoneInput
                   international
@@ -440,7 +440,7 @@ export default function ProfilePage() {
                 onClick={handleSendPhoneVerification}
                 disabled={!phoneNumber}
               >
-                Send Verification Code
+                {t("sendVerificationCode")}
               </Button>
             </>
           )}
@@ -448,7 +448,7 @@ export default function ProfilePage() {
           {phoneVerificationStep === "sending" && (
             <div className="flex flex-col items-center justify-center py-4">
               <Spinner />
-              <p className="mt-2 text-sm text-gray-600">Sending verification code...</p>
+              <p className="mt-2 text-sm text-gray-600">{t("sendingVerificationCode")}</p>
             </div>
           )}
 
@@ -456,7 +456,7 @@ export default function ProfilePage() {
             <>
               <div>
                 <p className="text-sm text-gray-700 mb-2">
-                  Enter the verification code sent to {phoneNumber}
+                  {t("enterVerificationCode")} {phoneNumber}
                 </p>
                 <Input
                   type="text"
@@ -473,7 +473,7 @@ export default function ProfilePage() {
                   onClick={handleVerifyPhoneCode}
                   disabled={verificationCode.length < 6}
                 >
-                  Verify Code
+                  {t("verifyCode")}
                 </Button>
                 <Button
                   variant="outline"
@@ -483,7 +483,7 @@ export default function ProfilePage() {
                     setConfirmationResult(null);
                   }}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
               </div>
             </>

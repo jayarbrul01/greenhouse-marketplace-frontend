@@ -29,24 +29,24 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-xs sm:text-sm text-gray-600">
-              Your trusted marketplace for greenhouse products, services, jobs, and buy requests.
+              {t("footerDescription")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">Quick Links</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">{t("quickLinks")}</h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <Link href="/listings" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
                   {t("listings")}
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/dashboard" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
                   {t("dashboard")}
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link href="/login" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
                   {t("login")}
@@ -62,26 +62,26 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">Support</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">{t("support")}</h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <Link href="/about" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
-                  About Us
+                  {t("aboutUs")}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
-                  Contact
+                  {t("contact")}
                 </Link>
               </li>
               <li>
                 <Link href="/help" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
-                  Help Center
+                  {t("helpCenter")}
                 </Link>
               </li>
               <li>
                 <Link href="/privacy" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
-                  Privacy Policy
+                  {t("privacyPolicy")}
                 </Link>
               </li>
             </ul>
@@ -91,7 +91,7 @@ export function Footer() {
         {/* Bottom Section */}
         <div className="pt-4 sm:pt-6 border-t border-gray-200/50 text-center">
           <p className="text-xs sm:text-sm text-gray-600">
-            © {currentYear} {t("appName")}. All rights reserved.
+            © {currentYear} {t("appName")}. {t("allRightsReserved")}
           </p>
         </div>
       </Container>

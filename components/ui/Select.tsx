@@ -1,13 +1,13 @@
 import { SelectHTMLAttributes } from "react";
 
-type Props = SelectHTMLAttributes<HTMLSelectElement> & {
+type Props = Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> & {
   variant?: "primary" | "outline";
   size?: "sm" | "md" | "lg";
 };
 
 export function Select({
-  variant = "outline",
-  size = "md",
+  variant = "outline" as const,
+  size = "md" as const,
   className = "",
   ...props
 }: Props) {
