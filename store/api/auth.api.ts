@@ -47,6 +47,7 @@ export type GoogleAuthResponse = {
 export type FirebaseAuthRequest = {
   idToken: string;
   phone?: string;
+  password?: string;
   roles?: string[];
 };
 

@@ -67,6 +67,7 @@ export default function SignUpPage() {
       const result = await firebaseAuth({ 
         idToken, 
         phone, 
+        password,
         roles 
       }).unwrap();
 
