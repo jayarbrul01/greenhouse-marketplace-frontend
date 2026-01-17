@@ -12,6 +12,7 @@ export type UserProfile = {
   notifyEmail: boolean;
   notifySms: boolean;
   notifyInApp: boolean;
+  roles?: string[];
   createdAt: string;
 };
 
@@ -27,6 +28,16 @@ export type UpdatePreferencesRequest = {
   notifyInApp?: boolean;
 };
 
+export type UpdateRolesRequest = {
+  roles: string[];
+};
+
+export type UpdateRolesResponse = {
+  roles: string[];
+  accessToken?: string;
+  refreshToken?: string;
+};
+
 export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getProfile: builder.query<UserProfile, void>({
@@ -34,6 +45,7 @@ export const userApi = api.injectEndpoints({
         url: "/users/me",
         method: "GET",
       }),
+      providesTags: ["User"],
     }),
     updateProfile: builder.mutation<UserProfile, UpdateProfileRequest>({
       query: (body) => ({
@@ -42,6 +54,7 @@ export const userApi = api.injectEndpoints({
         body,
         headers: { "content-type": "application/json" },
       }),
+      invalidatesTags: ["User"],
     }),
     updatePreferences: builder.mutation<{ notifyEmail: boolean; notifySms: boolean; notifyInApp: boolean }, UpdatePreferencesRequest>({
       query: (body) => ({
@@ -51,7 +64,16 @@ export const userApi = api.injectEndpoints({
         headers: { "content-type": "application/json" },
       }),
     }),
+    updateRoles: builder.mutation<UpdateRolesResponse, UpdateRolesRequest>({
+      query: (body) => ({
+        url: "/users/roles",
+        method: "PUT",
+        body,
+        headers: { "content-type": "application/json" },
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
-export const { useGetProfileQuery, useUpdateProfileMutation, useUpdatePreferencesMutation } = userApi;
+export const { useGetProfileQuery, useUpdateProfileMutation, useUpdatePreferencesMutation, useUpdateRolesMutation } = userApi;

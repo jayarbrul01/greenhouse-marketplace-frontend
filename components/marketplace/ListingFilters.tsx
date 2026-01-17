@@ -21,63 +21,64 @@ type Props = {
   onReset: () => void;
 };
 
-// Mock categories and regions - these should come from API in production
-const categories = [
-  "All Categories",
-  "Products",
-  "Services",
-  "Jobs",
-  "Buy Requests",
-];
-
-const regions = [
-  "All Regions",
-  "North America",
-  "South America",
-  "Europe",
-  "Asia",
-  "Africa",
-  "Oceania",
-];
 
 export function ListingFilters({ filters, onFiltersChange, onReset }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const handleChange = (field: keyof FilterState, value: string) => {
     onFiltersChange({ ...filters, [field]: value });
   };
 
+  // Get translated categories and regions
+  const allCategoriesText = t("allCategories");
+  const allRegionsText = t("allRegions");
+  
+  const categories = [
+    allCategoriesText,
+    t("productsCategory"),
+    t("servicesCategory"),
+    t("jobsCategory"),
+  ];
+
+  const regions = [
+    allRegionsText,
+    t("northAmerica"),
+    t("southAmerica"),
+    t("europe"),
+    t("asia"),
+    t("africa"),
+    t("oceania"),
+  ];
+
   const hasActiveFilters =
     filters.q ||
-    (filters.category && filters.category !== "All Categories") ||
-    (filters.region && filters.region !== "All Regions") ||
+    (filters.category && filters.category !== allCategoriesText) ||
+    (filters.region && filters.region !== allRegionsText) ||
     filters.minPrice ||
     filters.maxPrice;
 
   return (
-    <Card className="lg:sticky lg:top-4 h-fit">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-md font-semibold text-gray-900">Filters</h3>
+    <div className="lg:sticky lg:top-4 h-fit bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900 mb-0">{t("filters")}</h3>
           {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="md"
+            <button
               onClick={onReset}
-              className="text-md text-gray-600 hover:text-green-700"
+              className="text-sm text-gray-500 hover:text-green-600 transition-colors font-medium"
             >
-              Clear All
-            </Button>
+              {t("clearAll")}
+            </button>
           )}
         </div>
 
         {/* Keyword Search */}
         <div>
-          <label className="mb-1 block text-md font-medium text-gray-700">
-            Search
+          <label className="mb-2 block text-sm font-semibold text-gray-900">
+            {t("search")}
           </label>
           <Input
-            placeholder="Search listings..."
+            placeholder={t("searchProducts")}
             value={filters.q}
             onChange={(e) => handleChange("q", e.target.value)}
             className="text-sm"
@@ -86,11 +87,11 @@ export function ListingFilters({ filters, onFiltersChange, onReset }: Props) {
 
         {/* Category Filter */}
         <div>
-          <label className="mb-1 block text-md font-medium text-gray-700">
-            Category
+          <label className="mb-2 block text-sm font-semibold text-gray-900">
+            {t("category")}
           </label>
           <Select
-            value={filters.category || "All Categories"}
+            value={filters.category || allCategoriesText}
             onChange={(e) => handleChange("category", e.target.value)}
             className="text-sm w-full"
           >
@@ -104,11 +105,11 @@ export function ListingFilters({ filters, onFiltersChange, onReset }: Props) {
 
         {/* Region Filter */}
         <div>
-          <label className="mb-1 block text-md font-medium text-gray-700">
-            Region
+          <label className="mb-2 block text-sm font-semibold text-gray-900">
+            {t("region")}
           </label>
           <Select
-            value={filters.region || "All Regions"}
+            value={filters.region || allRegionsText}
             onChange={(e) => handleChange("region", e.target.value)}
             className="text-sm w-full"
           >
@@ -122,29 +123,33 @@ export function ListingFilters({ filters, onFiltersChange, onReset }: Props) {
 
         {/* Price Range */}
         <div>
-          <label className="mb-1 block text-md font-medium text-gray-700">
-            Price Range
+          <label className="mb-2 block text-sm font-semibold text-gray-900">
+            {t("priceRange")}
           </label>
-          <div className="space-y-2">
-            <Input
-              type="number"
-              placeholder="Min price"
-              value={filters.minPrice}
-              onChange={(e) => handleChange("minPrice", e.target.value)}
-              className="text-sm"
-              min="0"
-            />
-            <Input
-              type="number"
-              placeholder="Max price"
-              value={filters.maxPrice}
-              onChange={(e) => handleChange("maxPrice", e.target.value)}
-              className="text-sm"
-              min="0"
-            />
+          <div className="space-y-3">
+            <div>
+              <Input
+                type="number"
+                placeholder={t("minPrice")}
+                value={filters.minPrice}
+                onChange={(e) => handleChange("minPrice", e.target.value)}
+                className="text-sm"
+                min="0"
+              />
+            </div>
+            <div>
+              <Input
+                type="number"
+                placeholder={t("maxPrice")}
+                value={filters.maxPrice}
+                onChange={(e) => handleChange("maxPrice", e.target.value)}
+                className="text-sm"
+                min="0"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

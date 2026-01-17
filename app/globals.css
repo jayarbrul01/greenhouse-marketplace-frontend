@@ -81,6 +81,11 @@ body {
   z-index: 1;
 }
 
+/* Footer should not have z-index to avoid covering modals */
+footer {
+  z-index: 0 !important;
+}
+
 /* Hide Next.js dev indicator */
 [data-nextjs-toast],
 [data-nextjs-dialog],

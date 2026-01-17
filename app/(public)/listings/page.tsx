@@ -4,9 +4,9 @@ import { useState, useMemo, useEffect } from "react";
 import { Container } from "@/components/layout/Container";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
-import { useGetListingsQuery } from "@/store/api/listings.api";
+import { useGetAllPostsQuery } from "@/store/api/posts.api";
 import { ListingFilters, type FilterState } from "@/components/marketplace/ListingFilters";
-import { ListingCard } from "@/components/marketplace/ListingCard";
+import { ProductCard } from "@/components/marketplace/ProductCard";
 import { Pagination } from "@/components/marketplace/Pagination";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -66,7 +66,7 @@ export default function ListingsPage() {
     setCurrentPage(1);
   }, [debouncedSearchQuery]);
 
-  const { data, isLoading, error } = useGetListingsQuery(queryParams);
+  const { data, isLoading, error } = useGetAllPostsQuery(queryParams);
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
@@ -90,7 +90,7 @@ export default function ListingsPage() {
     <Container>
       <h1 className="text-xl sm:text-2xl font-bold mb-6">{t("listings")}</h1>
 
-      <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+      <div className="flex flex-col lg:flex-row items-start gap-0">
         {/* Filters Sidebar */}
         <aside className="w-full lg:w-64 flex-shrink-0">
           <ListingFilters
@@ -99,6 +99,9 @@ export default function ListingsPage() {
             onReset={handleReset}
           />
         </aside>
+
+        {/* Vertical Divider */}
+        <div className="hidden lg:block w-px bg-gray-200 mx-6 flex-shrink-0 self-stretch min-h-[400px]"></div>
 
         {/* Main Content */}
         <div className="flex-1 min-w-0">
@@ -115,14 +118,14 @@ export default function ListingsPage() {
                 Failed to load listings. Check backend + `NEXT_PUBLIC_API_URL`.
               </p>
             </Card>
-          ) : data?.items && data.items.length > 0 ? (
+          ) : data?.posts && data.posts.length > 0 ? (
             <>
-              <div className="mb-4 text-sm text-gray-600">
-                Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, data.total)} of {data.total} listings
+              <div className="mb-5 text-sm text-gray-600 font-medium">
+                Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, data.total)} of {data.total} products
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {data.items.map((item) => (
-                  <ListingCard key={item.id} item={item} />
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {data.posts.map((post) => (
+                  <ProductCard key={post.id} post={post} />
                 ))}
               </div>
               <Pagination
@@ -134,7 +137,7 @@ export default function ListingsPage() {
           ) : (
             <Card>
               <p className="text-sm text-gray-600 text-center py-8">
-                No listings found. Try adjusting your filters.
+                No products found. Try adjusting your filters.
               </p>
             </Card>
           )}

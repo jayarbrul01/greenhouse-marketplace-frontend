@@ -10,7 +10,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-gray-200/50 bg-white/80 backdrop-blur-md shadow-sm mt-auto">
+    <footer className="border-t border-gray-200/50 bg-white/80 backdrop-blur-md shadow-sm mt-auto !z-0">
       <Container className="py-4 sm:py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-4 sm:mb-6">
           {/* Brand Section */}
@@ -38,8 +38,8 @@ export function Footer() {
             <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">{t("quickLinks")}</h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
-                <Link href="/listings" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
-                  {t("listings")}
+                <Link href="/" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                  {t("home")}
                 </Link>
               </li>
               {/* <li>

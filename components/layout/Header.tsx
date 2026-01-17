@@ -54,9 +54,9 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-4 lg:gap-6">
           <Link 
             className="text-md font-medium text-gray-700 hover:text-green-600 transition-colors duration-200 relative group" 
-            href="/listings"
+            href="/"
           >
-            {t("listings")}
+            {t("home")}
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
           </Link>
           {isAuthenticated && (
@@ -144,11 +144,11 @@ export function Header() {
         <div className="md:hidden border-t border-white/20 bg-white/80 backdrop-blur-xl animate-in slide-in-from-top duration-300">
           <Container className="py-4 space-y-2">
             <Link
-              href="/listings"
+              href="/"
               className="block text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-white/50 rounded-lg px-3 py-2.5 transition-all duration-200"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {t("listings")}
+              {t("home")}
             </Link>
             {isAuthenticated && (
               <Link

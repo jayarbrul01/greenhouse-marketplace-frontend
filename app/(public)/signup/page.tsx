@@ -114,7 +114,8 @@ export default function SignUpPage() {
 
   const handleGoogleSuccess = async (idToken: string, firebaseUser: { email: string; name?: string; emailVerified: boolean }) => {
     try {
-      // Save user data to backend database using Firebase auth endpoint
+
+     // Save user data to backend database using Firebase auth endpoint
       const result = await firebaseAuth({ 
         idToken,
         roles: ["BUYER"] // Default role for Google signups
