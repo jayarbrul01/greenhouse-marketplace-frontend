@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { useRegisterMutation, useFirebaseAuthMutation } from "@/store/api/auth.api";
-import { setAccessToken } from "@/lib/auth";
+import { setAccessToken, getAccessToken } from "@/lib/auth";
 import { useAppDispatch } from "@/store/hooks";
 import { loginSuccess } from "@/store/slices/auth.slice";
 import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
@@ -31,10 +31,32 @@ export default function SignUpPage() {
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
   const [isMounted, setIsMounted] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    // Check if user is already authenticated
+    const token = getAccessToken();
+    if (token) {
+      // User is already logged in, redirect to home
+      router.replace("/");
+    } else {
+      setIsCheckingAuth(false);
+    }
+  }, [router]);
+
+  // Don't render the form if checking auth or if user is authenticated
+  if (isCheckingAuth) {
+    return (
+      <Container className="max-w-md mx-auto px-4 sm:px-6">
+        <Card>
+          <div className="flex items-center justify-center py-8">
+            <Spinner />
+          </div>
+        </Card>
+      </Container>
+    );
+  }
 
   const toggleRole = (role: string) => {
     setRoles((prev) =>
