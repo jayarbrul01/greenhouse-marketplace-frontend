@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { Modal } from "@/components/ui/Modal";
 import { Pagination } from "@/components/marketplace/Pagination";
-import { useGetProfileQuery, useUpdateProfileMutation, useUpdatePreferencesMutation, useUpdateRolesMutation } from "@/store/api/user.api";
+import { useGetProfileQuery, useUpdateProfileMutation, useUpdateRolesMutation } from "@/store/api/user.api";
 import { useCheckFirebasePhoneVerificationMutation } from "@/store/api/auth.api";
 import { setAccessToken } from "@/lib/auth";
 import { useCreatePostMutation, useGetUserPostsQuery, useDeletePostMutation, useUploadImageMutation, useUploadVideoMutation } from "@/store/api/posts.api";
@@ -28,7 +28,6 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"profile" | "products">("profile");
   const { data: profile, isLoading, refetch } = useGetProfileQuery();
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
-  const [updatePreferences, { isLoading: isUpdatingPrefs }] = useUpdatePreferencesMutation();
   const [updateRoles, { isLoading: isUpdatingRoles }] = useUpdateRolesMutation();
   const [checkPhoneVerification] = useCheckFirebasePhoneVerificationMutation();
   const [createPost, { isLoading: isCreatingPost }] = useCreatePostMutation();
@@ -64,10 +63,6 @@ export default function ProfilePage() {
   const [region, setRegion] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState<"en" | "es" | "fr">("en");
   
-  // Preferences state
-  const [notifyEmail, setNotifyEmail] = useState(true);
-  const [notifySms, setNotifySms] = useState(false);
-  
   // Roles state
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   
@@ -89,8 +84,6 @@ export default function ProfilePage() {
       setFullName(profile.fullName || "");
       setRegion(profile.region || "");
       setPreferredLanguage(profile.preferredLanguage as "en" | "es" | "fr" || "en");
-      setNotifyEmail(profile.notifyEmail);
-      setNotifySms(profile.notifySms);
       setPhoneNumber(profile.phone || "");
       setSelectedRoles(profile.roles || []);
     }
@@ -133,20 +126,6 @@ export default function ProfilePage() {
       refetch();
     } catch (err: any) {
       const errorMessage = err.data?.message || err.message || "Failed to update profile.";
-      toast.error(errorMessage);
-    }
-  };
-
-  const handleUpdatePreferences = async () => {
-    try {
-      await updatePreferences({
-        notifyEmail,
-        notifySms,
-      }).unwrap();
-      toast.success("Preferences updated successfully!");
-      refetch();
-    } catch (err: any) {
-      const errorMessage = err.data?.message || err.message || "Failed to update preferences.";
       toast.error(errorMessage);
     }
   };
@@ -610,46 +589,6 @@ export default function ProfilePage() {
                 </span>
               ) : (
                 t("updateProfile")
-              )}
-            </Button>
-          </div>
-        </Card>
-
-        {/* Notification Preferences */}
-        <Card title={t("notificationPreferences")}>
-          <div className="space-y-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={notifyEmail}
-                onChange={(e) => setNotifyEmail(e.target.checked)}
-                className="rounded border-gray-300 text-green-600 focus:ring-green-600"
-              />
-              <span className="text-sm text-gray-900">{t("emailNotifications")}</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={notifySms}
-                onChange={(e) => setNotifySms(e.target.checked)}
-                className="rounded border-gray-300 text-green-600 focus:ring-green-600"
-              />
-              <span className="text-sm text-gray-900">{t("smsNotifications")}</span>
-            </label>
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleUpdatePreferences}
-              disabled={isUpdatingPrefs}
-            >
-              {isUpdatingPrefs ? (
-                <span className="flex items-center gap-2">
-                  <Spinner /> {t("updating")}
-                </span>
-              ) : (
-                t("updatePreferences")
               )}
             </Button>
           </div>
