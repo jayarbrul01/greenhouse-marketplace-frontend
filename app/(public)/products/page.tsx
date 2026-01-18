@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { Input } from "@/components/ui/Input";
@@ -23,7 +23,17 @@ export type FilterState = {
 
 const ITEMS_PER_PAGE = 12;
 
-export default function ProductsPage() {
+// Map category keys to English category names (for API)
+const categoryKeyToEnglish: Record<string, string> = {
+  equipmentCategory: "Equipment",
+  jobsCategory: "Jobs",
+  packagingMaterialCategory: "Packaging Material",
+  farmingMachinesCategory: "Farming Machines",
+  freeStuffCategory: "Free Stuff",
+  consultationCategory: "Consultation",
+};
+
+function ProductsPageContent() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,6 +41,9 @@ export default function ProductsPage() {
   // Get category and search query from URL query params
   const categoryFromUrl = searchParams.get("category") || "";
   const searchQueryFromUrl = searchParams.get("q") || "";
+  const regionsFromUrl = searchParams.get("regions")?.split(",").filter(r => r) || [];
+  const minPriceFromUrl = searchParams.get("minPrice") || "";
+  const maxPriceFromUrl = searchParams.get("maxPrice") || "";
   
   // Get translated default values
   const allCategoriesText = t("allCategories");
@@ -39,9 +52,9 @@ export default function ProductsPage() {
   const [filters, setFilters] = useState<FilterState>({
     q: searchQueryFromUrl,
     category: categoryFromUrl,
-    regions: [],
-    minPrice: "",
-    maxPrice: "",
+    regions: regionsFromUrl,
+    minPrice: minPriceFromUrl,
+    maxPrice: maxPriceFromUrl,
   });
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -49,15 +62,43 @@ export default function ProductsPage() {
   useEffect(() => {
     const categoryParam = searchParams.get("category") || "";
     const searchParam = searchParams.get("q") || "";
-    if (categoryParam !== filters.category || searchParam !== filters.q) {
+    const regionsParam = searchParams.get("regions")?.split(",").filter(r => r) || [];
+    const minPriceParam = searchParams.get("minPrice") || "";
+    const maxPriceParam = searchParams.get("maxPrice") || "";
+    
+    if (categoryParam !== filters.category || 
+        searchParam !== filters.q ||
+        JSON.stringify(regionsParam) !== JSON.stringify(filters.regions) ||
+        minPriceParam !== filters.minPrice ||
+        maxPriceParam !== filters.maxPrice) {
+      // Convert English category name to translated label if needed
+      let categoryLabel = categoryParam;
+      if (categoryParam) {
+        const englishCategory = Object.values(categoryKeyToEnglish).find(
+          eng => eng === categoryParam
+        );
+        if (englishCategory) {
+          // Find the category key for this English name
+          const categoryKey = Object.keys(categoryKeyToEnglish).find(
+            key => categoryKeyToEnglish[key] === englishCategory
+          );
+          if (categoryKey) {
+            categoryLabel = t(categoryKey as keyof typeof translations.en);
+          }
+        }
+      }
+      
       setFilters(prev => ({ 
         ...prev, 
-        category: categoryParam,
+        category: categoryLabel,
         q: searchParam,
+        regions: regionsParam,
+        minPrice: minPriceParam,
+        maxPrice: maxPriceParam,
       }));
       setCurrentPage(1);
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   // Update filters when language changes
   useEffect(() => {
@@ -139,7 +180,12 @@ export default function ProductsPage() {
 
     if (debouncedSearchQuery) params.q = debouncedSearchQuery;
     if (filters.category && filters.category !== "" && filters.category !== allCategoriesText) {
-      params.category = filters.category;
+      // Find the category key that matches the current category label
+      const categoryKey = Object.keys(categoryKeyToEnglish).find(
+        key => t(key as keyof typeof translations.en) === filters.category
+      );
+      // Use English category name for API if found, otherwise use the category as-is
+      params.category = categoryKey ? categoryKeyToEnglish[categoryKey] : filters.category;
     }
     if (filters.regions && filters.regions.length > 0) {
       params.region = filters.regions;
@@ -154,7 +200,7 @@ export default function ProductsPage() {
     }
 
     return params;
-  }, [debouncedSearchQuery, filters.category, filters.regions, filters.minPrice, filters.maxPrice, currentPage, allCategoriesText]);
+  }, [debouncedSearchQuery, filters.category, filters.regions, filters.minPrice, filters.maxPrice, currentPage, allCategoriesText, t]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -163,8 +209,10 @@ export default function ProductsPage() {
   const { data, isLoading, error } = useGetAllPostsQuery(queryParams);
 
   const handleChange = (field: keyof FilterState, value: string) => {
-    setFilters({ ...filters, [field]: value });
+    setFilters(prev => ({ ...prev, [field]: value }));
     setCurrentPage(1);
+    // Automatically trigger search when filters change (optional - can remove if you want manual search button)
+    // The queryParams will update automatically and trigger the API call
   };
 
   const handleReset = () => {
@@ -189,6 +237,7 @@ export default function ProductsPage() {
       };
     });
     setCurrentPage(1);
+    // Region filter works together with category - queryParams will automatically include both
   };
 
   const totalPages = data?.totalPages || Math.ceil((data?.total || 0) / ITEMS_PER_PAGE);
@@ -265,17 +314,27 @@ export default function ProductsPage() {
                   key={category.key}
                   onClick={() => {
                     const newCategory = category.key === "allCategories" ? "" : category.label;
-                    // Clear search query when selecting a category to show all products in that category
+                    // Update category filter while preserving other filters (region, price)
                     setFilters(prev => ({ 
                       ...prev, 
                       category: newCategory,
                       q: "" // Clear search query when category is selected
                     }));
                     setCurrentPage(1);
-                    // Update URL to reflect category selection
+                    // Update URL to reflect category selection (preserve other params if needed)
                     const params = new URLSearchParams();
                     if (newCategory) {
                       params.set("category", newCategory);
+                    }
+                    // Preserve region and price filters in URL if they exist
+                    if (filters.regions.length > 0) {
+                      params.set("regions", filters.regions.join(","));
+                    }
+                    if (filters.minPrice) {
+                      params.set("minPrice", filters.minPrice);
+                    }
+                    if (filters.maxPrice) {
+                      params.set("maxPrice", filters.maxPrice);
                     }
                     router.push(`/products?${params.toString()}`, { scroll: false });
                   }}
@@ -411,7 +470,27 @@ export default function ProductsPage() {
 
             {/* Search Button */}
             <Button
-              onClick={() => {}}
+              onClick={() => {
+                // Update URL with current filters
+                const params = new URLSearchParams();
+                if (filters.category) {
+                  params.set("category", filters.category);
+                }
+                if (filters.q) {
+                  params.set("q", filters.q);
+                }
+                if (filters.regions.length > 0) {
+                  params.set("regions", filters.regions.join(","));
+                }
+                if (filters.minPrice) {
+                  params.set("minPrice", filters.minPrice);
+                }
+                if (filters.maxPrice) {
+                  params.set("maxPrice", filters.maxPrice);
+                }
+                router.push(`/products?${params.toString()}`, { scroll: false });
+                setCurrentPage(1);
+              }}
               className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 px-6 whitespace-nowrap"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -473,5 +552,22 @@ export default function ProductsPage() {
         )}
       </div>
     </Container>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <Container>
+          <div className="flex items-center justify-center py-12">
+            <Spinner />
+            <span className="ml-3 text-sm text-gray-400">Loading...</span>
+          </div>
+        </Container>
+      }
+    >
+      <ProductsPageContent />
+    </Suspense>
   );
 }
