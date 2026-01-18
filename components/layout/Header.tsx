@@ -28,84 +28,94 @@ export function Header() {
   }, [dispatch]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/20 bg-white/70 backdrop-blur-xl shadow-lg shadow-black/5">
-      <Container className="flex h-18 sm:h-20 lg:h-24 items-center justify-between">
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b-2 border-green-800/30 shadow-xl shadow-black/20 backdrop-blur-2xl">
+      <Container className="flex h-24 sm:h-28 lg:h-32 items-center justify-between py-2">
         <Link 
           href="/" 
-          className="flex items-center gap-3 sm:gap-4 hover:opacity-80 transition-opacity duration-200 group"
+          className="flex items-center gap-4 sm:gap-5 hover:opacity-90 transition-all duration-300 group"
         >
           <div className="relative">
             <Image
               src="/logo.png"
               alt={t("appName")}
-              width={64}
-              height={64}
-              className="h-14 w-14 sm:h-16 sm:w-16 lg:h-20 lg:w-20 object-contain transition-transform duration-200 group-hover:scale-105"
+              width={80}
+              height={80}
+              className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 object-contain transition-transform duration-300 group-hover:scale-110"
               priority
               unoptimized
             />
           </div>
-          <span className="font-bold text-lg sm:text-xl lg:text-2xl bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent hidden sm:inline-block">
-            {t("appName")}
-          </span>
+          <div className="flex flex-col">
+            <span className="font-extrabold text-xl sm:text-2xl lg:text-3xl bg-gradient-to-r from-green-400 via-green-500 to-green-400 bg-clip-text text-transparent hidden sm:block tracking-tight">
+              {t("appName")}
+            </span>
+            <span className="text-xs sm:text-sm text-gray-400 font-medium hidden sm:block mt-0.5">
+              Marketplace
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-4 lg:gap-6">
+        <nav className="hidden md:flex items-center gap-6 lg:gap-8">
           <Link 
-            className="text-md font-medium text-gray-700 hover:text-green-600 transition-colors duration-200 relative group" 
+            className="text-base lg:text-lg font-semibold text-gray-300 hover:text-green-400 transition-all duration-300 relative group px-2 py-1" 
             href="/"
           >
             {t("home")}
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+            <span className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-green-400 to-green-500 group-hover:w-full transition-all duration-300 rounded-full"></span>
           </Link>
           {isAuthenticated && (
             <Link 
-              className="text-md font-medium text-gray-700 hover:text-green-600 transition-colors duration-200 relative group" 
+              className="text-base lg:text-lg font-semibold text-gray-300 hover:text-green-400 transition-all duration-300 relative group px-2 py-1" 
               href="/profile"
             >
               Profile
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-green-400 to-green-500 group-hover:w-full transition-all duration-300 rounded-full"></span>
             </Link>
           )}
-          {/* <Link 
-            className="text-md font-medium text-gray-700 hover:text-green-600 transition-colors duration-200 relative group" 
-            href="/dashboard"
-          >
-            {t("dashboard")}
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-green-600 group-hover:w-full transition-all duration-300"></span>
-          </Link> */}
 
-          <div className="h-6 w-px bg-gray-300"></div>
+          <div className="h-8 w-0.5 bg-gradient-to-b from-transparent via-gray-600 to-transparent"></div>
 
-          <LanguageSelector
-            value={language}
-            onChange={setLanguage}
-            size="md"
-          />
-
-          {!mounted ? (
-            <Link href="/login">
-              <Button size="md" className="shadow-md hover:shadow-lg transition-shadow">{t("login")}</Button>
-            </Link>
-          ) : isAuthenticated ? (
-            <Button
-              variant="outline"
+          <div className="flex items-center gap-4">
+            <LanguageSelector
+              value={language}
+              onChange={setLanguage}
               size="md"
-              className="hover:bg-gray-50 transition-colors"
-              onClick={() => {
-                clearAccessToken();
-                dispatch(logout());
-                router.push("/login");
-              }}
-            >
-              {t("logout")}
-            </Button>
-          ) : (
-            <Link href="/login">
-              <Button size="sm" className="shadow-md hover:shadow-lg transition-shadow">{t("login")}</Button>
-            </Link>
-          )}
+            />
+
+            {!mounted ? (
+              <Link href="/login">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  {t("login")}
+                </Button>
+              </Link>
+            ) : isAuthenticated ? (
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-2 border-gray-600 hover:border-green-500 hover:bg-gray-800 text-gray-300 hover:text-green-400 font-semibold px-6 py-3 transition-all duration-300"
+                onClick={() => {
+                  clearAccessToken();
+                  dispatch(logout());
+                  router.push("/login");
+                }}
+              >
+                {t("logout")}
+              </Button>
+            ) : (
+              <Link href="/login">
+                <Button 
+                  size="lg" 
+                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  {t("login")}
+                </Button>
+              </Link>
+            )}
+          </div>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -117,11 +127,11 @@ export function Header() {
           />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl hover:bg-white/50 transition-all duration-200 active:scale-95"
+            className="p-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 border border-gray-700"
             aria-label="Toggle menu"
           >
             <svg
-              className="w-6 h-6 text-gray-700 transition-transform duration-300"
+              className="w-6 h-6 text-gray-300 transition-transform duration-300"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -141,41 +151,56 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/20 bg-white/80 backdrop-blur-xl animate-in slide-in-from-top duration-300">
-          <Container className="py-4 space-y-2">
+        <div className="md:hidden border-t-2 border-green-800/30 bg-gradient-to-b from-gray-900 to-gray-800 backdrop-blur-xl animate-in slide-in-from-top duration-300 shadow-lg">
+          <Container className="py-6 space-y-3">
             <Link
               href="/"
-              className="block text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-white/50 rounded-lg px-3 py-2.5 transition-all duration-200"
+              className="block text-base font-semibold text-gray-300 hover:text-green-400 hover:bg-gray-800 rounded-xl px-4 py-3 transition-all duration-300 border border-transparent hover:border-green-700"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {t("home")}
+              <span className="flex items-center gap-3">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                {t("home")}
+              </span>
             </Link>
             {isAuthenticated && (
               <Link
                 href="/profile"
-                className="block text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-white/50 rounded-lg px-3 py-2.5 transition-all duration-200"
+                className="block text-base font-semibold text-gray-300 hover:text-green-400 hover:bg-gray-800 rounded-xl px-4 py-3 transition-all duration-300 border border-transparent hover:border-green-700"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Profile
+                <span className="flex items-center gap-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Profile
+                </span>
               </Link>
             )}
-            <Link
-              href="/dashboard"
-              className="block text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-white/50 rounded-lg px-3 py-2.5 transition-all duration-200"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("dashboard")}
-            </Link>
-            <div className="pt-3 border-t border-gray-200/50 mt-3">
+            <div className="pt-4 border-t-2 border-green-800/30 mt-4 space-y-3">
+              <div className="px-4">
+                <LanguageSelector
+                  value={language}
+                  onChange={setLanguage}
+                  size="sm"
+                />
+              </div>
               {!mounted ? (
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full shadow-md" size="sm">{t("login")}</Button>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-semibold shadow-lg" 
+                    size="md"
+                  >
+                    {t("login")}
+                  </Button>
                 </Link>
               ) : isAuthenticated ? (
                 <Button
                   variant="outline"
-                  className="w-full hover:bg-gray-50"
-                  size="sm"
+                  className="w-full border-2 border-gray-600 hover:border-green-500 hover:bg-gray-800 text-gray-300 hover:text-green-400 font-semibold"
+                  size="md"
                   onClick={() => {
                     clearAccessToken();
                     dispatch(logout());
@@ -187,7 +212,12 @@ export function Header() {
                 </Button>
               ) : (
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full shadow-md" size="sm">{t("login")}</Button>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-semibold shadow-lg" 
+                    size="md"
+                  >
+                    {t("login")}
+                  </Button>
                 </Link>
               )}
             </div>

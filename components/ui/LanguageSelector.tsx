@@ -47,13 +47,14 @@ export function LanguageSelector({
           ${sizes[sizeValue].padding}
           rounded-full
           appearance-none
-          bg-white
+          bg-gray-800
           border
-          border-gray-300
-          hover:border-gray-400
+          border-gray-600
+          hover:border-gray-500
           focus:outline-none
           focus:ring-2
-          focus:ring-green-600
+          focus:ring-green-500
+          focus:border-green-500
           cursor-pointer
           transition
           disabled:opacity-50
@@ -87,10 +88,11 @@ export function LanguageSelector({
             justify-center
             gap-1.5
             font-medium
+            text-gray-100
           `}
         >
           <span>{languageFlags[value]}</span>
-          <span>|</span>
+          <span className="text-gray-400">|</span>
           <span>{languageCodes[value]}</span>
         </span>
       </div>

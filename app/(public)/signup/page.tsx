@@ -191,7 +191,7 @@ export default function SignUpPage() {
             priority
             unoptimized
           />
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-100">
             {t("signUp")}
           </h2>
         </div>
@@ -206,9 +206,8 @@ export default function SignUpPage() {
             `}
             style={{ transitionDelay: isMounted ? "100ms" : "0ms" }}
           >
-            <label className="mb-1 block text-sm font-medium text-gray-900">{t("email")}</label>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t("email")}</label>
             <Input
-              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
@@ -225,7 +224,7 @@ export default function SignUpPage() {
             `}
             style={{ transitionDelay: isMounted ? "150ms" : "0ms" }}
           >
-            <label className="mb-1 block text-sm font-medium text-gray-900">{t("phone")}</label>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t("phone")}</label>
             <Input
               type="tel"
               value={phone}
@@ -244,7 +243,7 @@ export default function SignUpPage() {
             `}
             style={{ transitionDelay: isMounted ? "200ms" : "0ms" }}
           >
-            <label className="mb-1 block text-sm font-medium text-gray-900">{t("password")}</label>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t("password")}</label>
             <Input
               type="password"
               value={password}
@@ -263,7 +262,7 @@ export default function SignUpPage() {
             `}
             style={{ transitionDelay: isMounted ? "250ms" : "0ms" }}
           >
-            <label className="mb-1 block text-sm font-medium text-gray-900">{t("confirmPassword")}</label>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t("confirmPassword")}</label>
             <Input
               type="password"
               value={confirmPassword}
@@ -271,7 +270,7 @@ export default function SignUpPage() {
               placeholder="Re-enter your password"
             />
             {password && confirmPassword && password !== confirmPassword && (
-              <p className="mt-1 text-xs text-red-600">{t("passwordsDoNotMatch")}</p>
+              <p className="mt-1 text-xs text-red-400">{t("passwordsDoNotMatch")}</p>
             )}
           </div>
 
@@ -285,22 +284,22 @@ export default function SignUpPage() {
             `}
             style={{ transitionDelay: isMounted ? "300ms" : "0ms" }}
           >
-            <label className="mb-2 block text-sm font-medium text-gray-900">{t("selectRole")}</label>
+            <label className="mb-2 block text-sm font-medium text-gray-300">{t("selectRole")}</label>
             <div className="space-y-2">
               {["BUYER", "SELLER", "WISHLIST"].map((role) => (
-                <label key={role} className="flex items-center gap-2 cursor-pointer">
+                <label key={role} className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                   <input
                     type="checkbox"
                     checked={roles.includes(role)}
                     onChange={() => toggleRole(role)}
-                    className="rounded border-gray-300 text-green-600 focus:ring-green-600"
+                    className="w-4 h-4 rounded border-2 border-gray-600 bg-gray-700 text-green-500 focus:ring-2 focus:ring-green-500 focus:ring-offset-0 focus:ring-offset-gray-800 cursor-pointer checked:bg-green-600 checked:border-green-600"
                   />
-                  <span className="text-sm text-gray-900">{roleLabels[role]}</span>
+                  <span className="text-sm text-gray-200">{roleLabels[role]}</span>
                 </label>
               ))}
             </div>
             {roles.length === 0 && (
-              <p className="mt-1 text-xs text-red-600">{t("pleaseSelectRole")}</p>
+              <p className="mt-1 text-xs text-red-400">{t("pleaseSelectRole")}</p>
             )}
           </div>
 
@@ -339,19 +338,19 @@ export default function SignUpPage() {
           </div>
 
 
-          <p className="text-center text-sm text-gray-900">
+          <p className="text-center text-sm text-gray-300">
             {t("alreadyHaveAccount")}{" "}
-            <Link href="/login" className="font-medium text-green-700 hover:underline">
+            <Link href="/login" className="font-medium text-green-400 hover:text-green-300 hover:underline">
               {t("login")}
             </Link>
           </p>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-gray-600"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">{t("orContinueWith")}</span>
+              <span className="px-2 bg-gray-800 text-gray-400">{t("orContinueWith")}</span>
             </div>
           </div>
 

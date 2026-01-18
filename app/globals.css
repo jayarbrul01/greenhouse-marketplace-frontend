@@ -10,8 +10,8 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -21,24 +21,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   font-family: 'Exo2', Arial, Helvetica, sans-serif;
-  color: #1f2937 !important;
+  color: #f3f4f6 !important;
 }
 
-/* Modern gradient background - always light and modern */
+/* Modern gradient background - dark mode */
 .modern-bg {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
   position: relative;
   min-height: 100vh;
-  color: #1f2937 !important;
+  color: #f3f4f6 !important;
 }
 
 .modern-bg * {
@@ -51,14 +44,14 @@ body {
 .modern-bg h4,
 .modern-bg h5,
 .modern-bg h6 {
-  color: #111827 !important;
+  color: #f9fafb !important;
 }
 
 .modern-bg p,
 .modern-bg span,
 .modern-bg label,
 .modern-bg div {
-  color: #1f2937 !important;
+  color: #e5e7eb !important;
 }
 
 .modern-bg::before {
@@ -69,9 +62,9 @@ body {
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
@@ -109,17 +102,19 @@ footer {
 .PhoneInputInput {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #374151;
   border-radius: 0.5rem;
   font-size: 0.875rem;
+  background-color: #1f2937;
+  color: #f3f4f6;
   outline: none;
   transition: all 0.2s;
 }
 
 .PhoneInputInput:focus {
-  border-color: #16a34a;
+  border-color: #22c55e;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
 }
 
 .PhoneInputCountry {
@@ -129,4 +124,134 @@ footer {
 .PhoneInputCountryIcon {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+/* Dark mode input styling - apply to all inputs */
+input,
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="number"] {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #4b5563 !important;
+  -webkit-text-fill-color: #f3f4f6 !important;
+}
+
+/* Webkit autofill override - comprehensive coverage */
+input:-webkit-autofill,
+input[type="text"]:-webkit-autofill,
+input[type="email"]:-webkit-autofill,
+input[type="tel"]:-webkit-autofill,
+input[type="password"]:-webkit-autofill,
+input[type="number"]:-webkit-autofill {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #4b5563 !important;
+  -webkit-text-fill-color: #f3f4f6 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1f2937 inset !important;
+  box-shadow: 0 0 0px 1000px #1f2937 inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+input:-webkit-autofill:hover,
+input[type="text"]:-webkit-autofill:hover,
+input[type="email"]:-webkit-autofill:hover,
+input[type="tel"]:-webkit-autofill:hover,
+input[type="password"]:-webkit-autofill:hover,
+input[type="number"]:-webkit-autofill:hover {
+  background-color: #1f2937 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1f2937 inset !important;
+  box-shadow: 0 0 0px 1000px #1f2937 inset !important;
+}
+
+input:-webkit-autofill:focus,
+input[type="text"]:-webkit-autofill:focus,
+input[type="email"]:-webkit-autofill:focus,
+input[type="tel"]:-webkit-autofill:focus,
+input[type="password"]:-webkit-autofill:focus,
+input[type="number"]:-webkit-autofill:focus {
+  background-color: #1f2937 !important;
+  border-color: #22c55e !important;
+  -webkit-text-fill-color: #f3f4f6 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #1f2937 inset, 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
+  box-shadow: 0 0 0px 1000px #1f2937 inset, 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus {
+  border-color: #22c55e !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Dark mode checkbox styling */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #4b5563;
+  border-radius: 0.25rem;
+  background-color: #374151;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #22c55e;
+  border-color: #22c55e;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L6 10.586l5.793-5.793a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+input[type="checkbox"]:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #22c55e;
+  ring-offset: 0;
+  ring-offset-color: #1f2937;
+}
+
+input[type="checkbox"]:hover {
+  border-color: #6b7280;
+}
+
+input[type="checkbox"]:checked:hover {
+  border-color: #16a34a;
+  background-color: #16a34a;
+}
+
+/* Dark mode select/option styling */
+select {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #4b5563 !important;
+}
+
+select option {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+}
+
+select:focus {
+  border-color: #22c55e !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
 }

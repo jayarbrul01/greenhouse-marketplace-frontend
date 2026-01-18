@@ -673,7 +673,7 @@ export default function ProfilePage() {
                 </Card>
               ) : postsData?.posts && postsData.posts.length > 0 ? (
                 <>
-                  <div className="mb-4 text-sm text-gray-600">
+                  <div className="mb-4 text-sm text-gray-400">
                     Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, postsData.total)} of {postsData.total} products
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -683,9 +683,9 @@ export default function ProfilePage() {
                         onClick={() => router.push(`/profile/products/${post.id}`)}
                         className="group cursor-pointer"
                       >
-                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col hover:shadow-xl hover:border-green-300 transition-all duration-300 transform hover:-translate-y-1">
+                        <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden h-full flex flex-col hover:shadow-xl hover:border-green-500 transition-all duration-300 transform hover:-translate-y-1">
                           {/* Image Section */}
-                          <div className="relative overflow-hidden bg-gray-100">
+                          <div className="relative overflow-hidden bg-gray-700">
                             {post.image ? (
                               <div className="relative h-48 overflow-hidden">
                                 <img
@@ -701,20 +701,20 @@ export default function ProfilePage() {
                                 )}
                                 {post.price && (
                                   <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <div className="bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2">
-                                      <p className="text-xs text-gray-500 font-medium">Price</p>
-                                      <p className="text-xl font-bold text-green-600">${post.price}</p>
+                                    <div className="bg-gray-800/95 backdrop-blur-sm rounded-lg px-3 py-2 border border-gray-700">
+                                      <p className="text-xs text-gray-400 font-medium">Price</p>
+                                      <p className="text-xl font-bold text-green-400">${post.price}</p>
                                     </div>
                                   </div>
                                 )}
                               </div>
                             ) : (
-                              <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                              <div className="h-48 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
                                 <div className="text-center">
-                                  <svg className="w-16 h-16 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <svg className="w-16 h-16 text-gray-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                   </svg>
-                                  <p className="text-xs text-gray-500">No image</p>
+                                  <p className="text-xs text-gray-400">No image</p>
                                 </div>
                               </div>
                             )}
@@ -723,51 +723,51 @@ export default function ProfilePage() {
                           {/* Content Section */}
                           <div className="p-5 flex-1 flex flex-col">
                             <div className="flex-1">
-                              <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">
+                              <h3 className="font-bold text-gray-100 text-lg mb-2 line-clamp-2 group-hover:text-green-400 transition-colors">
                                 {post.title}
                               </h3>
                               {post.information && (
-                                <p className="text-sm text-gray-600 line-clamp-2 mb-4 leading-relaxed">
+                                <p className="text-sm text-gray-400 line-clamp-2 mb-4 leading-relaxed">
                                   {post.information}
                                 </p>
                               )}
                             </div>
 
                             {/* Details Section */}
-                            <div className="mt-auto pt-4 border-t border-gray-100">
+                            <div className="mt-auto pt-4 border-t border-gray-700">
                               <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
                                 {post.price && (
                                   <div className="flex items-center gap-1.5">
-                                    <div className="p-1.5 bg-green-100 rounded-lg">
-                                      <svg className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="p-1.5 bg-green-900/30 rounded-lg border border-green-700/50">
+                                      <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                       </svg>
                                     </div>
-                                    <span className="font-bold text-green-600 text-base">${post.price}</span>
+                                    <span className="font-bold text-green-400 text-base">${post.price}</span>
                                   </div>
                                 )}
                                 {post.region && (
                                   <div className="flex items-center gap-1.5">
-                                    <div className="p-1.5 bg-blue-100 rounded-lg">
-                                      <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="p-1.5 bg-blue-900/30 rounded-lg border border-blue-700/50">
+                                      <svg className="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                       </svg>
                                     </div>
-                                    <span className="text-xs font-medium text-gray-700">{post.region}</span>
+                                    <span className="text-xs font-medium text-gray-300">{post.region}</span>
                                   </div>
                                 )}
                               </div>
                               
                               {/* Footer */}
-                              <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-                                <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                              <div className="flex items-center justify-between pt-2 border-t border-gray-700">
+                                <div className="flex items-center gap-1.5 text-xs text-gray-400">
                                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                   </svg>
                                   <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                                 </div>
-                                <div className="flex items-center gap-1 text-xs text-green-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex items-center gap-1 text-xs text-green-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                                   <span>View Details</span>
                                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -790,7 +790,7 @@ export default function ProfilePage() {
                 </>
               ) : (
                 <Card>
-                  <p className="text-sm text-gray-500 text-center py-8">
+                  <p className="text-sm text-gray-400 text-center py-8">
                     {searchQuery ? "No products found matching your search." : t("noPosts")}
                   </p>
                 </Card>
@@ -900,7 +900,7 @@ export default function ProfilePage() {
       >
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">
+            <label className="mb-1 block text-sm font-medium text-gray-300">
               {t("postTitle")} *
             </label>
             <Input
@@ -912,7 +912,7 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">
+            <label className="mb-1 block text-sm font-medium text-gray-300">
               {t("postInformation")}
             </label>
             <textarea
@@ -920,12 +920,12 @@ export default function ProfilePage() {
               onChange={(e) => setPostInformation(e.target.value)}
               placeholder="Enter post information"
               rows={4}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600"
+              className="w-full rounded-lg border border-gray-600 bg-gray-800 text-gray-100 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-500"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">
+            <label className="mb-1 block text-sm font-medium text-gray-300">
               {t("postPrice")}
             </label>
             <Input
@@ -940,7 +940,7 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">
+              <label className="mb-1 block text-sm font-medium text-gray-300">
                 {t("postCategory")}
               </label>
               <Select
@@ -948,14 +948,17 @@ export default function ProfilePage() {
                 onChange={(e) => setPostCategory(e.target.value)}
               >
                 <option value="">Select a category</option>
-                <option value="Products">Products</option>
-                <option value="Services">Services</option>
+                <option value="Equipment">Equipment</option>
                 <option value="Jobs">Jobs</option>
+                <option value="Packaging Material">Packaging Material</option>
+                <option value="Farming Machines">Farming Machines</option>
+                <option value="Free Stuff">Free Stuff</option>
+                <option value="Consultation">Consultation</option>
               </Select>
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">
+              <label className="mb-1 block text-sm font-medium text-gray-300">
                 {t("region")}
               </label>
               <Select
@@ -974,11 +977,11 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">
+            <label className="mb-1 block text-sm font-medium text-gray-300">
               {t("postImage")}
             </label>
             {!isSeller && (
-              <p className="text-xs text-amber-600 mb-2">
+              <p className="text-xs text-amber-400 mb-2">
                 You need SELLER role to upload images. Please update your roles first.
               </p>
             )}
@@ -988,10 +991,10 @@ export default function ProfilePage() {
                 accept="image/*"
                 onChange={handleImageFileChange}
                 disabled={!isSeller}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {isUploadingImage && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-gray-400">
                   <Spinner /> {t("uploading")}
                 </div>
               )}
@@ -1000,7 +1003,7 @@ export default function ProfilePage() {
                   <img
                     src={postImage}
                     alt="Preview"
-                    className="w-full h-32 object-cover rounded"
+                    className="w-full h-32 object-cover rounded border border-gray-700"
                   />
                 </div>
               )}
@@ -1008,11 +1011,11 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-900">
+            <label className="mb-1 block text-sm font-medium text-gray-300">
               {t("postVideo")}
             </label>
             {!isSeller && (
-              <p className="text-xs text-amber-600 mb-2">
+              <p className="text-xs text-amber-400 mb-2">
                 You need SELLER role to upload videos. Please update your roles first.
               </p>
             )}
@@ -1022,10 +1025,10 @@ export default function ProfilePage() {
                 accept="video/*"
                 onChange={handleVideoFileChange}
                 disabled={!isSeller}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {isUploadingVideo && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-gray-400">
                   <Spinner /> {t("uploading")}
                 </div>
               )}
@@ -1034,7 +1037,7 @@ export default function ProfilePage() {
                   <video
                     src={postVideo}
                     controls
-                    className="w-full h-32 rounded"
+                    className="w-full h-32 rounded border border-gray-700"
                   />
                 </div>
               )}

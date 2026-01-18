@@ -35,9 +35,12 @@ export function ListingFilters({ filters, onFiltersChange, onReset }: Props) {
   
   const categories = [
     allCategoriesText,
-    t("productsCategory"),
-    t("servicesCategory"),
+    t("equipmentCategory"),
     t("jobsCategory"),
+    t("packagingMaterialCategory"),
+    t("farmingMachinesCategory"),
+    t("freeStuffCategory"),
+    t("consultationCategory"),
   ];
 
   const regions = [

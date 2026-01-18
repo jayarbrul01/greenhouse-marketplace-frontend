@@ -51,7 +51,7 @@ export type GetUserPostsResponse = {
 export type GetAllPostsQuery = {
   q?: string;
   category?: string;
-  region?: string;
+  region?: string | string[]; // Support single or multiple regions
   minPrice?: number;
   maxPrice?: number;
   page?: number;
@@ -129,7 +129,14 @@ export const postsApi = api.injectEndpoints({
         if (params) {
           if (params.q) searchParams.append("q", params.q);
           if (params.category) searchParams.append("category", params.category);
-          if (params.region) searchParams.append("region", params.region);
+          if (params.region) {
+            // Handle multiple regions - send as comma-separated string
+            if (Array.isArray(params.region)) {
+              searchParams.append("region", params.region.join(","));
+            } else {
+              searchParams.append("region", params.region);
+            }
+          }
           if (params.minPrice !== undefined) searchParams.append("minPrice", params.minPrice.toString());
           if (params.maxPrice !== undefined) searchParams.append("maxPrice", params.maxPrice.toString());
           if (params.page) searchParams.append("page", params.page.toString());

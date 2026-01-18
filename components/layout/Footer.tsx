@@ -10,7 +10,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-gray-200/50 bg-white/80 backdrop-blur-md shadow-sm mt-auto !z-0">
+    <footer className="border-t border-gray-700/50 bg-gray-900/80 backdrop-blur-md shadow-sm mt-auto !z-0">
       <Container className="py-4 sm:py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-4 sm:mb-6">
           {/* Brand Section */}
@@ -24,36 +24,36 @@ export function Footer() {
                 className="h-12 w-12 sm:h-14 sm:w-14 object-contain transition-transform duration-200 group-hover:scale-105"
                 unoptimized
               />
-              <span className="text-base sm:text-lg font-semibold text-gray-900">
+              <span className="text-base sm:text-lg font-semibold text-gray-100">
                 {t("appName")}
               </span>
             </Link>
-            <p className="text-xs sm:text-sm text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-400">
               {t("footerDescription")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">{t("quickLinks")}</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-100 mb-2 sm:mb-3">{t("quickLinks")}</h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
-                <Link href="/" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                <Link href="/" className="text-xs sm:text-sm text-gray-400 hover:text-green-400 transition">
                   {t("home")}
                 </Link>
               </li>
               {/* <li>
-                <Link href="/dashboard" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                <Link href="/dashboard" className="text-xs sm:text-sm text-gray-400 hover:text-green-400 transition">
                   {t("dashboard")}
                 </Link>
               </li> */}
               <li>
-                <Link href="/login" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                <Link href="/login" className="text-xs sm:text-sm text-gray-400 hover:text-green-400 transition">
                   {t("login")}
                 </Link>
               </li>
               <li>
-                <Link href="/signup" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                <Link href="/signup" className="text-xs sm:text-sm text-gray-400 hover:text-green-400 transition">
                   {t("signUp")}
                 </Link>
               </li>
@@ -62,25 +62,25 @@ export function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">{t("support")}</h3>
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-100 mb-2 sm:mb-3">{t("support")}</h3>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
-                <Link href="/about" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                <Link href="/about" className="text-xs sm:text-sm text-gray-400 hover:text-green-400 transition">
                   {t("aboutUs")}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                <Link href="/contact" className="text-xs sm:text-sm text-gray-400 hover:text-green-400 transition">
                   {t("contact")}
                 </Link>
               </li>
               <li>
-                <Link href="/help" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                <Link href="/help" className="text-xs sm:text-sm text-gray-400 hover:text-green-400 transition">
                   {t("helpCenter")}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-xs sm:text-sm text-gray-600 hover:text-green-700 transition">
+                <Link href="/privacy" className="text-xs sm:text-sm text-gray-400 hover:text-green-400 transition">
                   {t("privacyPolicy")}
                 </Link>
               </li>
@@ -89,8 +89,8 @@ export function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="pt-4 sm:pt-6 border-t border-gray-200/50 text-center">
-          <p className="text-xs sm:text-sm text-gray-600">
+        <div className="pt-4 sm:pt-6 border-t border-gray-700/50 text-center">
+          <p className="text-xs sm:text-sm text-gray-400">
             © {currentYear} {t("appName")}. {t("allRightsReserved")}
           </p>
         </div>

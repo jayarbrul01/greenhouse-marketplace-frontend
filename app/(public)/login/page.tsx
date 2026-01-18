@@ -123,7 +123,7 @@ export default function LoginPage() {
             priority
             unoptimized
           />
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-100">
             {t("login")}
           </h2>
         </div>
@@ -138,7 +138,7 @@ export default function LoginPage() {
             `}
             style={{ transitionDelay: isMounted ? "100ms" : "0ms" }}
           >
-            <label className="mb-1 block text-sm font-medium text-gray-900">{t("emailOrPhone")}</label>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t("emailOrPhone")}</label>
             <Input value={emailOrPhone} onChange={(e) => setEmailOrPhone(e.target.value)} />
           </div>
 
@@ -152,7 +152,7 @@ export default function LoginPage() {
             `}
             style={{ transitionDelay: isMounted ? "200ms" : "0ms" }}
           >
-            <label className="mb-1 block text-sm font-medium text-gray-900">{t("password")}</label>
+            <label className="mb-1 block text-sm font-medium text-gray-300">{t("password")}</label>
             <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
@@ -182,19 +182,19 @@ export default function LoginPage() {
           </div>
 
 
-          <p className="text-center text-sm text-gray-900">
+          <p className="text-center text-sm text-gray-300">
             {t("dontHaveAccount")}{" "}
-            <Link href="/signup" className="font-medium text-green-700 hover:underline">
+            <Link href="/signup" className="font-medium text-green-400 hover:text-green-300 hover:underline">
               {t("signUp")}
             </Link>
           </p>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-gray-600"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">{t("orContinueWith")}</span>
+              <span className="px-2 bg-gray-800 text-gray-400">{t("orContinueWith")}</span>
             </div>
           </div>
 
