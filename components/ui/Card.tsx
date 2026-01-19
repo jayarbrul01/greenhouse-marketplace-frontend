@@ -11,11 +11,9 @@ export function Card({
       <div className={`
         rounded-2xl 
         border 
-        border-gray-900/80 
-        border-t-green-500/60 
-        border-r-green-500/60 
-        border-t-2 
-        border-r-2 
+        // border-gray-900/80 
+        border-green-500/60 
+        border-2 
         bg-black/95 
         backdrop-blur-xl 
         shadow-2xl 

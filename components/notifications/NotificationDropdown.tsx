@@ -48,17 +48,17 @@ export function NotificationDropdown({ isOpen, onClose, buttonRef }: Notificatio
         const buttonRect = buttonRef.current.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        const spacing = 8; // mt-2 = 8px
+        const spacing = 12; // Spacing between button and dropdown
         const dropdownWidth = 384; // w-96 = 384px on desktop
         const mobileDropdownWidth = window.innerWidth - 32; // calc(100vw - 2rem)
         const isMobile = window.innerWidth < 640; // sm breakpoint
         const actualDropdownWidth = isMobile ? mobileDropdownWidth : dropdownWidth;
 
-        // Calculate right position - distance from right edge of viewport
-        // Align dropdown's right edge with button's right edge (or close to it)
+        // Calculate right position - align dropdown's right edge with button's right edge
+        // This makes the dropdown appear naturally positioned below/around the bell icon
         let right = viewportWidth - buttonRect.right;
         
-        // Ensure dropdown doesn't go off the left edge of screen
+        // Ensure dropdown doesn't go off the edges of screen
         const minRight = 16;
         const maxRight = viewportWidth - actualDropdownWidth - 16;
         right = Math.max(minRight, Math.min(right, maxRight));

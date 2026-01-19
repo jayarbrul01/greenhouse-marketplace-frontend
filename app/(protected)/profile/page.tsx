@@ -195,6 +195,7 @@ export default function ProfilePage() {
   };
 
   const isSeller = profile?.roles?.includes("SELLER") || false;
+  const canUpload = profile?.roles?.some((role: string) => ["SELLER", "BUYER", "WISHLIST"].includes(role)) || false;
 
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -205,9 +206,9 @@ export default function ProfilePage() {
       return;
     }
 
-    // Check if user has SELLER role
-    if (!isSeller) {
-      toast.error("You need SELLER role to upload images.");
+    // Check if user has SELLER, BUYER, or WISHLIST role
+    if (!canUpload) {
+      toast.error("You need SELLER, BUYER, or WISHLIST role to upload images.");
       e.target.value = ""; // Reset file input
       return;
     }
@@ -223,7 +224,7 @@ export default function ProfilePage() {
       console.error("Upload error:", err);
       let errorMessage = "Failed to upload image";
       if (err.status === 403) {
-        errorMessage = "You need SELLER role to upload images. Please update your roles first.";
+        errorMessage = "You need SELLER, BUYER, or WISHLIST role to upload images. Please update your roles first.";
       } else if (err.data?.message) {
         errorMessage = err.data.message;
       } else if (err.data?.error) {
@@ -244,9 +245,9 @@ export default function ProfilePage() {
       return;
     }
 
-    // Check if user has SELLER role
-    if (!isSeller) {
-      toast.error("You need SELLER role to upload videos. Please update your roles first.");
+    // Check if user has SELLER, BUYER, or WISHLIST role
+    if (!canUpload) {
+      toast.error("You need SELLER, BUYER, or WISHLIST role to upload videos.");
       e.target.value = ""; // Reset file input
       return;
     }
@@ -262,7 +263,7 @@ export default function ProfilePage() {
       console.error("Upload error:", err);
       let errorMessage = "Failed to upload video";
       if (err.status === 403) {
-        errorMessage = "You need SELLER role to upload videos. Please update your roles first.";
+        errorMessage = "You need SELLER, BUYER, or WISHLIST role to upload videos. Please update your roles first.";
       } else if (err.data?.message) {
         errorMessage = err.data.message;
       } else if (err.data?.error) {
@@ -1082,9 +1083,9 @@ export default function ProfilePage() {
             <label className="mb-1 block text-sm font-medium text-gray-300">
               {t("postImage")}
             </label>
-            {!isSeller && (
+            {!canUpload && (
               <p className="text-xs text-amber-400 mb-2">
-                You need SELLER role to upload images. Please update your roles first.
+                You need SELLER, BUYER, or WISHLIST role to upload images. Please update your roles first.
               </p>
             )}
             <div className="space-y-2">
@@ -1092,7 +1093,7 @@ export default function ProfilePage() {
                 type="file"
                 accept="image/*"
                 onChange={handleImageFileChange}
-                disabled={!isSeller}
+                disabled={!canUpload}
                 className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {isUploadingImage && (
@@ -1116,9 +1117,9 @@ export default function ProfilePage() {
             <label className="mb-1 block text-sm font-medium text-gray-300">
               {t("postVideo")}
             </label>
-            {!isSeller && (
+            {!canUpload && (
               <p className="text-xs text-amber-400 mb-2">
-                You need SELLER role to upload videos. Please update your roles first.
+                You need SELLER, BUYER, or WISHLIST role to upload videos. Please update your roles first.
               </p>
             )}
             <div className="space-y-2">
@@ -1126,7 +1127,7 @@ export default function ProfilePage() {
                 type="file"
                 accept="video/*"
                 onChange={handleVideoFileChange}
-                disabled={!isSeller}
+                disabled={!canUpload}
                 className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600 file:text-white hover:file:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {isUploadingVideo && (

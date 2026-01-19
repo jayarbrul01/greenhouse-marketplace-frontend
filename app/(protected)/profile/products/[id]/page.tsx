@@ -29,6 +29,7 @@ export default function ProductDetailPage() {
   const [uploadVideo, { isLoading: isUploadingVideo }] = useUploadVideoMutation();
 
   const isSeller = profile?.roles?.includes("SELLER") || false;
+  const canUpload = profile?.roles?.some((role: string) => ["SELLER", "BUYER", "WISHLIST"].includes(role)) || false;
   const [isEditing, setIsEditing] = useState(false);
 
   // Form state
@@ -65,8 +66,8 @@ export default function ProductDetailPage() {
       return;
     }
 
-    if (!isSeller) {
-      toast.error("You need SELLER role to upload images.");
+    if (!canUpload) {
+      toast.error("You need SELLER, BUYER, or WISHLIST role to upload images.");
       e.target.value = "";
       return;
     }
@@ -82,7 +83,7 @@ export default function ProductDetailPage() {
       console.error("Upload error:", err);
       let errorMessage = "Failed to upload image";
       if (err.status === 403) {
-        errorMessage = "You need SELLER role to upload images. Please update your roles first.";
+        errorMessage = "You need SELLER, BUYER, or WISHLIST role to upload images. Please update your roles first.";
       } else if (err.data?.message) {
         errorMessage = err.data.message;
       } else if (err.data?.error) {
@@ -103,8 +104,8 @@ export default function ProductDetailPage() {
       return;
     }
 
-    if (!isSeller) {
-      toast.error("You need SELLER role to upload videos. Please update your roles first.");
+    if (!canUpload) {
+      toast.error("You need SELLER, BUYER, or WISHLIST role to upload videos.");
       e.target.value = "";
       return;
     }
@@ -120,7 +121,7 @@ export default function ProductDetailPage() {
       console.error("Upload error:", err);
       let errorMessage = "Failed to upload video";
       if (err.status === 403) {
-        errorMessage = "You need SELLER role to upload videos. Please update your roles first.";
+        errorMessage = "You need SELLER, BUYER, or WISHLIST role to upload videos. Please update your roles first.";
       } else if (err.data?.message) {
         errorMessage = err.data.message;
       } else if (err.data?.error) {
@@ -369,7 +370,7 @@ export default function ProductDetailPage() {
                           type="file"
                           accept="image/*"
                           onChange={handleImageFileChange}
-                          disabled={!isSeller || isUploadingImage}
+                          disabled={!canUpload || isUploadingImage}
                           className="hidden"
                         />
                       </label>
@@ -425,7 +426,7 @@ export default function ProductDetailPage() {
                           type="file"
                           accept="video/*"
                           onChange={handleVideoFileChange}
-                          disabled={!isSeller || isUploadingVideo}
+                          disabled={!canUpload || isUploadingVideo}
                           className="hidden"
                         />
                       </label>
