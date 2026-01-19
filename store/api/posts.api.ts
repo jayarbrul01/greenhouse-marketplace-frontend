@@ -104,7 +104,7 @@ export const postsApi = api.injectEndpoints({
         body,
         headers: { "content-type": "application/json" },
       }),
-      invalidatesTags: ["Posts"],
+      invalidatesTags: ["Posts", "Notifications"],
     }),
     getUserPosts: builder.query<GetUserPostsResponse, GetUserPostsQuery | void>({
       query: (params) => {

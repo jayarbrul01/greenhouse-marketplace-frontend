@@ -11,21 +11,22 @@ export function Card({
       <div className={`
         rounded-2xl 
         border 
-        border-gray-700/50 
-        border-t-green-500 
-        border-r-green-500 
+        border-gray-900/80 
+        border-t-green-500/60 
+        border-r-green-500/60 
         border-t-2 
         border-r-2 
-        bg-gray-800/90 
-        backdrop-blur-sm 
-        shadow-lg 
+        bg-black/95 
+        backdrop-blur-xl 
+        shadow-2xl 
+        shadow-black/50
         p-5
         sm:p-6
         lg:p-7
-        text-gray-100 
+        text-white 
         ${className}
       `}>
-        {title ? <h2 className="text-base sm:text-lg font-semibold text-gray-100">{title}</h2> : null}
+        {title ? <h2 className="text-base sm:text-lg font-semibold text-white">{title}</h2> : null}
         <div className={title ? "mt-3 sm:mt-4" : ""}>{children}</div>
       </div>
     );

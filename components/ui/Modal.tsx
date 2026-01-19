@@ -29,17 +29,17 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
       
       {/* Modal Content */}
       <div
-        className="relative bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] flex flex-col my-4 border border-gray-700"
+        className="relative bg-black rounded-2xl shadow-2xl shadow-black/80 max-w-md w-full max-h-[90vh] flex flex-col my-4 border border-gray-900/80"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-700 flex-shrink-0">
-            <h2 className="text-lg font-semibold text-gray-100">{title}</h2>
+          <div className="flex items-center justify-between p-6 border-b border-gray-900/80 flex-shrink-0 bg-gradient-to-r from-black to-gray-950">
+            <h2 className="text-lg font-bold text-white">{title}</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-200 transition-colors"

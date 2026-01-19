@@ -6,11 +6,11 @@ export function ProductCard({ post }: { post: Post & { user?: { id: string; full
 
   return (
     <div 
-      className="group bg-gray-800 rounded-2xl border border-gray-700 overflow-hidden shadow-sm hover:shadow-2xl hover:border-green-500 transition-all duration-500 cursor-pointer h-full flex flex-col transform hover:-translate-y-2"
+      className="group bg-black rounded-2xl border border-gray-900/80 overflow-hidden shadow-2xl shadow-black/50 hover:shadow-green-500/20 hover:border-green-500/60 transition-all duration-500 cursor-pointer h-full flex flex-col transform hover:-translate-y-2"
       onClick={() => router.push(`/products/${post.id}`)}
     >
       {/* Image Section */}
-      <div className="relative w-full h-64 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900">
+      <div className="relative w-full h-64 overflow-hidden bg-gradient-to-br from-gray-950 to-black">
         {post.image ? (
           <>
             <img
@@ -34,7 +34,7 @@ export function ProductCard({ post }: { post: Post & { user?: { id: string; full
         {/* Category Badge */}
         {post.category && (
           <div className="absolute top-4 left-4 z-10">
-            <span className="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-gray-800/95 backdrop-blur-md text-green-400 rounded-full shadow-lg border border-green-500/50">
+            <span className="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-black/95 backdrop-blur-md text-green-400 rounded-full shadow-lg border border-green-500/60">
               {post.category}
             </span>
           </div>
@@ -43,7 +43,7 @@ export function ProductCard({ post }: { post: Post & { user?: { id: string; full
         {/* Price Overlay on Hover */}
         {post.price != null && (
           <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
-            <div className="bg-gray-800/95 backdrop-blur-md rounded-xl px-4 py-3 shadow-xl border border-gray-700/50">
+            <div className="bg-black/95 backdrop-blur-md rounded-xl px-4 py-3 shadow-xl border border-gray-900/80">
               <p className="text-xs text-gray-400 font-medium mb-1">Price</p>
               <p className="text-2xl font-bold text-green-400">${post.price}</p>
             </div>
@@ -52,21 +52,21 @@ export function ProductCard({ post }: { post: Post & { user?: { id: string; full
       </div>
       
       {/* Content Section */}
-      <div className="p-6 flex flex-col flex-1 bg-gray-800">
+      <div className="p-6 flex flex-col flex-1 bg-black">
         {/* Title */}
-        <h3 className="text-xl font-bold text-gray-100 line-clamp-2 mb-3 group-hover:text-green-400 transition-colors duration-300 leading-tight">
+        <h3 className="text-xl font-bold text-white line-clamp-2 mb-3 group-hover:text-green-400 transition-colors duration-300 leading-tight">
           {post.title}
         </h3>
         
         {/* Description */}
         {post.information && (
-          <p className="text-sm text-gray-400 line-clamp-2 mb-5 leading-relaxed">
+          <p className="text-sm text-gray-300 line-clamp-2 mb-5 leading-relaxed">
             {post.information}
           </p>
         )}
         
         {/* Details Section */}
-        <div className="mt-auto pt-5 border-t border-gray-700">
+        <div className="mt-auto pt-5 border-t border-gray-900/80">
           {/* Price and Region Row */}
           <div className="flex items-center justify-between mb-4">
             {post.price != null && (
@@ -90,18 +90,18 @@ export function ProductCard({ post }: { post: Post & { user?: { id: string; full
           
           {/* Seller Info */}
           {post.user && (
-            <div className="flex items-center gap-3 pt-4 border-t border-gray-700">
+            <div className="flex items-center gap-3 pt-4 border-t border-gray-900/80">
               <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-md ring-2 ring-gray-800">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-md ring-2 ring-black">
                   <span className="text-sm font-bold text-white">
                     {(post.user.fullName || "U")[0].toUpperCase()}
                   </span>
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-gray-800 rounded-full"></div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-black rounded-full"></div>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-400 font-medium mb-0.5">Seller</p>
-                <p className="text-sm font-semibold text-gray-200 truncate">
+                <p className="text-sm font-semibold text-white truncate">
                   {post.user.fullName || "User"}
                 </p>
               </div>

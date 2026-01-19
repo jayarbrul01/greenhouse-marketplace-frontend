@@ -142,18 +142,18 @@ export default function HomePage() {
   return (
     <Container>
       <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-100 mb-2">
+        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
           {t("browseListings")}
         </h1>
-        <p className="text-gray-400">
+        <p className="text-gray-300">
           Search all products or browse by category
         </p>
       </div>
 
       {/* Main Search Block with Category Tabs */}
-      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 mb-8 overflow-hidden">
+      <div className="bg-black rounded-2xl shadow-2xl shadow-black/50 border border-gray-900/80 mb-8 overflow-hidden backdrop-blur-xl">
         {/* Category Tabs */}
-        <div className="border-b border-gray-700 bg-gray-800">
+        <div className="border-b border-gray-900/80 bg-black">
           <div className="flex flex-wrap">
             {categoryTabs.map((category) => {
               const isActive = selectedCategory === category.label;
@@ -165,11 +165,10 @@ export default function HomePage() {
                     px-6 py-3 text-sm font-medium transition-all duration-200 border-b-2 whitespace-nowrap
                     ${
                       isActive
-                        ? "bg-green-600 border-green-600 font-semibold"
-                        : "bg-gray-800 text-gray-300 hover:bg-gray-700 border-transparent"
+                        ? "bg-green-600 border-green-500 font-bold text-white"
+                        : "bg-black text-gray-300 hover:bg-gray-950 hover:text-white border-transparent"
                     }
                   `}
-                  style={isActive ? { color: '#ffffff' } : { color: '#d1d5db' }}
                 >
                   {category.label}
                 </button>
@@ -312,7 +311,7 @@ export default function HomePage() {
               )}
             </>
           ) : (
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center">
+            <div className="bg-black border border-gray-900/80 rounded-lg p-8 text-center">
               <p className="text-sm text-gray-400">
                 No products found matching your search criteria.
               </p>
@@ -323,13 +322,13 @@ export default function HomePage() {
         <>
           {/* Category Cards Grid */}
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-100 mb-6">Browse by Category</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">Browse by Category</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {categoryOptions.map((category) => (
                 <button
                   key={category.key}
                   onClick={() => handleCategoryClick(category.label)}
-                  className="group relative bg-gray-800 rounded-2xl shadow-lg border border-gray-700 p-8 hover:shadow-2xl hover:border-green-500 transition-all duration-300 transform hover:-translate-y-2 overflow-hidden"
+                  className="group relative bg-black rounded-2xl shadow-2xl shadow-black/50 border border-gray-900/80 p-8 hover:shadow-green-500/20 hover:border-green-500/60 transition-all duration-300 transform hover:-translate-y-2 overflow-hidden"
                 >
                   {/* Gradient Background on Hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 to-blue-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -342,7 +341,7 @@ export default function HomePage() {
                     </div>
                     
                     {/* Category Name */}
-                    <h3 className="text-xl font-bold text-gray-100 mb-2 group-hover:text-green-400 transition-colors">
+                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-green-400 transition-colors">
                       {category.label}
                     </h3>
                     
@@ -362,7 +361,7 @@ export default function HomePage() {
           {/* New Products Section */}
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-100">New Products</h2>
+              <h2 className="text-2xl font-bold text-white">New Products</h2>
               <button
                 onClick={() => router.push("/products")}
                 className="text-green-400 hover:text-green-300 font-medium text-sm flex items-center gap-1 transition-colors"
@@ -386,7 +385,7 @@ export default function HomePage() {
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center">
+              <div className="bg-black border border-gray-900/80 rounded-lg p-8 text-center">
                 <p className="text-sm text-gray-400">
                   No products available yet.
                 </p>

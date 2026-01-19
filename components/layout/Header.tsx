@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,9 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { clearAccessToken, getAccessToken } from "@/lib/auth";
 import { logout, hydrateAuth } from "@/store/slices/auth.slice";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { useGetUnreadCountQuery } from "@/store/api/notifications.api";
 
 export function Header() {
   const { isAuthenticated } = useAppSelector((s) => s.auth);
@@ -18,7 +21,39 @@ export function Header() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const desktopBellRef = useRef<HTMLButtonElement>(null);
+  const mobileBellRef = useRef<HTMLButtonElement>(null);
+  const [activeBellRef, setActiveBellRef] = useState<React.RefObject<HTMLButtonElement | null> | React.MutableRefObject<HTMLButtonElement | null> | null>(null);
   const { language, setLanguage, t } = useLanguage();
+  
+  // Fetch unread notification count (only when authenticated)
+  const { data: unreadCountData, refetch: refetchUnreadCount } = useGetUnreadCountQuery(undefined, {
+    skip: !isAuthenticated,
+    pollingInterval: 30000, // Poll every 30 seconds for new notifications
+  });
+
+  const unreadCount = unreadCountData?.count || 0;
+
+  // Determine which button ref to use (desktop takes priority if visible)
+  useEffect(() => {
+    const updateActiveRef = () => {
+      // Desktop is visible when window width >= 768px (md breakpoint)
+      if (typeof window !== "undefined") {
+        if (window.innerWidth >= 768 && desktopBellRef.current) {
+          setActiveBellRef(desktopBellRef as React.RefObject<HTMLButtonElement | null>);
+        } else if (mobileBellRef.current) {
+          setActiveBellRef(mobileBellRef as React.RefObject<HTMLButtonElement | null>);
+        } else {
+          setActiveBellRef((desktopBellRef.current ? desktopBellRef : mobileBellRef) as React.RefObject<HTMLButtonElement | null>);
+        }
+      }
+    };
+
+    updateActiveRef();
+    window.addEventListener("resize", updateActiveRef);
+    return () => window.removeEventListener("resize", updateActiveRef);
+  }, [mounted]);
 
   useEffect(() => {
     setMounted(true);
@@ -28,7 +63,7 @@ export function Header() {
   }, [dispatch]);
 
   return (
-    <header className="sticky top-0 z-50 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b-2 border-green-800/30 shadow-xl shadow-black/20 backdrop-blur-2xl">
+    <header className="sticky top-0 z-50 bg-black border-b-2 border-green-500/30 shadow-2xl shadow-black/50 backdrop-blur-xl">
       <Container className="flex h-24 sm:h-28 lg:h-32 items-center justify-between py-2">
         <Link 
           href="/" 
@@ -49,7 +84,7 @@ export function Header() {
             <span className="font-extrabold text-xl sm:text-2xl lg:text-3xl bg-gradient-to-r from-green-400 via-green-500 to-green-400 bg-clip-text text-transparent hidden sm:block tracking-tight">
               {t("appName")}
             </span>
-            <span className="text-xs sm:text-sm text-gray-400 font-medium hidden sm:block mt-0.5">
+            <span className="text-xs sm:text-sm text-gray-300 font-medium hidden sm:block mt-0.5">
               Marketplace
             </span>
           </div>
@@ -58,7 +93,7 @@ export function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6 lg:gap-8">
           <Link 
-            className="text-base lg:text-lg font-semibold text-gray-300 hover:text-green-400 transition-all duration-300 relative group px-2 py-1" 
+            className="text-base lg:text-lg font-semibold text-white hover:text-green-400 transition-all duration-300 relative group px-2 py-1" 
             href="/"
           >
             {t("home")}
@@ -66,7 +101,7 @@ export function Header() {
           </Link>
           {isAuthenticated && (
             <Link 
-              className="text-base lg:text-lg font-semibold text-gray-300 hover:text-green-400 transition-all duration-300 relative group px-2 py-1" 
+              className="text-base lg:text-lg font-semibold text-white hover:text-green-400 transition-all duration-300 relative group px-2 py-1" 
               href="/profile"
             >
               Profile
@@ -74,7 +109,7 @@ export function Header() {
             </Link>
           )}
 
-          <div className="h-8 w-0.5 bg-gradient-to-b from-transparent via-gray-600 to-transparent"></div>
+          <div className="h-8 w-0.5 bg-gradient-to-b from-transparent via-gray-800 to-transparent"></div>
 
           <div className="flex items-center gap-4">
             <LanguageSelector
@@ -82,6 +117,17 @@ export function Header() {
               onChange={setLanguage}
               size="md"
             />
+
+            {/* Notification Bell Icon - Only show when authenticated */}
+            {isAuthenticated && (
+              <NotificationBell
+                ref={desktopBellRef}
+                isOpen={notificationDropdownOpen}
+                onToggle={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
+                onClose={() => setNotificationDropdownOpen(false)}
+                unreadCount={unreadCount}
+              />
+            )}
 
             {!mounted ? (
               <Link href="/login">
@@ -96,7 +142,7 @@ export function Header() {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-2 border-gray-600 hover:border-green-500 hover:bg-gray-800 text-gray-300 hover:text-green-400 font-semibold px-6 py-3 transition-all duration-300"
+                className="border-2 border-gray-800 hover:border-green-500/60 hover:bg-black text-white hover:text-green-400 font-semibold px-6 py-3 transition-all duration-300"
                 onClick={() => {
                   clearAccessToken();
                   dispatch(logout());
@@ -125,13 +171,23 @@ export function Header() {
             onChange={setLanguage}
             size="sm"
           />
+          {/* Notification Bell Icon - Mobile - Only show when authenticated */}
+          {isAuthenticated && (
+            <NotificationBell
+              ref={mobileBellRef}
+              isOpen={notificationDropdownOpen}
+              onToggle={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
+              onClose={() => setNotificationDropdownOpen(false)}
+              unreadCount={unreadCount}
+            />
+          )}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-3 rounded-xl bg-gray-800/80 hover:bg-gray-700 shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 border border-gray-700"
+            className="p-3 rounded-xl bg-black hover:bg-gray-950 shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 border border-gray-900/80"
             aria-label="Toggle menu"
           >
             <svg
-              className="w-6 h-6 text-gray-300 transition-transform duration-300"
+              className="w-6 h-6 text-white transition-transform duration-300"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -151,11 +207,11 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t-2 border-green-800/30 bg-gradient-to-b from-gray-900 to-gray-800 backdrop-blur-xl animate-in slide-in-from-top duration-300 shadow-lg">
+        <div className="md:hidden border-t-2 border-green-500/30 bg-black backdrop-blur-xl animate-in slide-in-from-top duration-300 shadow-2xl shadow-black/50">
           <Container className="py-6 space-y-3">
             <Link
               href="/"
-              className="block text-base font-semibold text-gray-300 hover:text-green-400 hover:bg-gray-800 rounded-xl px-4 py-3 transition-all duration-300 border border-transparent hover:border-green-700"
+              className="block text-base font-semibold text-white hover:text-green-400 hover:bg-gray-950 rounded-xl px-4 py-3 transition-all duration-300 border border-transparent hover:border-green-500/60"
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="flex items-center gap-3">
@@ -168,7 +224,7 @@ export function Header() {
             {isAuthenticated && (
               <Link
                 href="/profile"
-                className="block text-base font-semibold text-gray-300 hover:text-green-400 hover:bg-gray-800 rounded-xl px-4 py-3 transition-all duration-300 border border-transparent hover:border-green-700"
+                className="block text-base font-semibold text-white hover:text-green-400 hover:bg-gray-950 rounded-xl px-4 py-3 transition-all duration-300 border border-transparent hover:border-green-500/60"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <span className="flex items-center gap-3">
@@ -199,7 +255,7 @@ export function Header() {
               ) : isAuthenticated ? (
                 <Button
                   variant="outline"
-                  className="w-full border-2 border-gray-600 hover:border-green-500 hover:bg-gray-800 text-gray-300 hover:text-green-400 font-semibold"
+                  className="w-full border-2 border-gray-800 hover:border-green-500/60 hover:bg-black text-white hover:text-green-400 font-semibold"
                   size="md"
                   onClick={() => {
                     clearAccessToken();
@@ -223,6 +279,15 @@ export function Header() {
             </div>
           </Container>
         </div>
+      )}
+
+      {/* Single Notification Dropdown - rendered once, uses active button ref */}
+      {isAuthenticated && activeBellRef && (
+        <NotificationDropdown
+          isOpen={notificationDropdownOpen}
+          onClose={() => setNotificationDropdownOpen(false)}
+          buttonRef={activeBellRef}
+        />
       )}
     </header>
   );

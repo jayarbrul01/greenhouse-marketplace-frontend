@@ -295,8 +295,8 @@ function ProductsPageContent() {
       </div>
 
       {/* Category Tabs */}
-      <div className="bg-gray-800 rounded-xl shadow-lg border border-gray-700 mb-8 overflow-visible">
-        <div className="border-b border-gray-700 bg-gray-800">
+      <div className="bg-black rounded-2xl shadow-2xl shadow-black/50 border border-gray-900/80 mb-8 overflow-visible backdrop-blur-xl">
+        <div className="border-b border-gray-900/80 bg-black">
           <div className="flex flex-wrap">
             {[
               { key: "allCategories", label: allCategoriesText },
@@ -343,7 +343,7 @@ function ProductsPageContent() {
                     ${
                       isActive
                         ? "bg-green-600 border-green-600 font-semibold"
-                        : "bg-gray-800 text-gray-300 hover:bg-gray-700 border-transparent"
+                        : "bg-black text-gray-300 hover:bg-gray-950 hover:text-white border-transparent"
                     }
                   `}
                   style={isActive ? { color: '#ffffff' } : { color: '#d1d5db' }}
@@ -364,7 +364,7 @@ function ProductsPageContent() {
                 <button
                   type="button"
                   onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 border border-gray-600 rounded-lg bg-gray-800 text-left hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 border border-gray-800 rounded-lg bg-black text-left hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
                 >
                   <svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -388,9 +388,9 @@ function ProductsPageContent() {
                 </button>
 
                 {isLocationDropdownOpen && (
-                  <div className="absolute z-[100] w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                  <div className="absolute z-[100] w-full mt-1 bg-black border border-gray-900/80 rounded-lg shadow-2xl shadow-black/80 max-h-60 overflow-y-auto">
                     <div className="p-2">
-                      <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 rounded cursor-pointer border-b border-gray-700 mb-1">
+                      <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-950 rounded cursor-pointer border-b border-gray-900/80 mb-1">
                         <input
                           type="checkbox"
                           checked={filters.regions.length === regions.filter(reg => reg !== allRegionsText).length}
@@ -408,7 +408,7 @@ function ProductsPageContent() {
                             }
                             setCurrentPage(1);
                           }}
-                          className="rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500"
+                          className="rounded border-gray-800 bg-black text-green-500 focus:ring-green-500"
                         />
                         <span className="text-sm font-semibold text-gray-200">
                           {filters.regions.length === regions.filter(reg => reg !== allRegionsText).length
@@ -420,13 +420,13 @@ function ProductsPageContent() {
                       {regions.filter(reg => reg !== allRegionsText).map((reg) => (
                         <label
                           key={reg}
-                          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-700 rounded cursor-pointer"
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-950 rounded cursor-pointer"
                         >
                           <input
                             type="checkbox"
                             checked={filters.regions.includes(reg)}
                             onChange={() => handleRegionToggle(reg)}
-                            className="rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500"
+                            className="rounded border-gray-800 bg-black text-green-500 focus:ring-green-500"
                           />
                           <span className="text-sm text-gray-300">{reg}</span>
                         </label>
@@ -544,7 +544,7 @@ function ProductsPageContent() {
             />
           </>
         ) : (
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center">
+          <div className="bg-black border border-gray-900/80 rounded-lg p-8 text-center">
             <p className="text-sm text-gray-400">
               No products found in this category. Try adjusting your filters.
             </p>
