@@ -92,10 +92,18 @@ export function ProductCard({ post }: { post: Post & { user?: { id: string; full
           {post.user && (
             <div className="flex items-center gap-3 pt-4 border-t border-gray-900/80">
               <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-md ring-2 ring-black">
-                  <span className="text-sm font-bold text-white">
-                    {(post.user.fullName || "U")[0].toUpperCase()}
-                  </span>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-md ring-2 ring-black overflow-hidden">
+                  {post.user.avatar ? (
+                    <img
+                      src={post.user.avatar}
+                      alt={post.user.fullName || "User"}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-sm font-bold text-white">
+                      {(post.user.fullName || "U")[0].toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-black rounded-full"></div>
               </div>

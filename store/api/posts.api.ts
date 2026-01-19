@@ -17,6 +17,10 @@ export type Post = {
     fullName: string | null;
     email: string;
     phone?: string;
+    phoneVerified?: boolean;
+    emailVerified?: boolean;
+    createdAt?: string;
+    avatar?: string | null;
   };
 };
 
@@ -123,6 +127,21 @@ export const postsApi = api.injectEndpoints({
       },
       providesTags: ["Posts"],
     }),
+    getPostsByUserId: builder.query<GetUserPostsResponse, { userId: string; q?: string; page?: number; limit?: number }>({
+      query: ({ userId, q, page, limit }) => {
+        const searchParams = new URLSearchParams();
+        if (q) searchParams.append("q", q);
+        if (page) searchParams.append("page", page.toString());
+        if (limit) searchParams.append("limit", limit.toString());
+        
+        const queryString = searchParams.toString();
+        return {
+          url: `/posts/user/${userId}${queryString ? `?${queryString}` : ""}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Posts"],
+    }),
     getAllPosts: builder.query<GetAllPostsResponse, GetAllPostsQuery | void>({
       query: (params) => {
         const searchParams = new URLSearchParams();
@@ -197,6 +216,7 @@ export const postsApi = api.injectEndpoints({
 export const {
   useCreatePostMutation,
   useGetUserPostsQuery,
+  useGetPostsByUserIdQuery,
   useGetAllPostsQuery,
   useGetPostQuery,
   useUpdatePostMutation,

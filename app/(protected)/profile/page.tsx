@@ -62,6 +62,8 @@ export default function ProfilePage() {
   const [fullName, setFullName] = useState("");
   const [region, setRegion] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState<"en" | "es" | "fr">("en");
+  const [avatar, setAvatar] = useState("");
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
   
   // Roles state
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
@@ -86,6 +88,7 @@ export default function ProfilePage() {
       setPreferredLanguage(profile.preferredLanguage as "en" | "es" | "fr" || "en");
       setPhoneNumber(profile.phone || "");
       setSelectedRoles(profile.roles || []);
+      setAvatar(profile.avatar || "");
     }
   }, [profile]);
 
@@ -121,12 +124,43 @@ export default function ProfilePage() {
         fullName: fullName || undefined,
         region: region || undefined,
         preferredLanguage: preferredLanguage,
+        avatar: avatar || undefined,
       }).unwrap();
       toast.success("Profile updated successfully!");
       refetch();
     } catch (err: any) {
       const errorMessage = err.data?.message || err.message || "Failed to update profile.";
       toast.error(errorMessage);
+    }
+  };
+
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    setSelectedAvatarFile(file);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const result = await uploadImage(formData).unwrap();
+      setAvatar(result.url);
+      toast.success("Avatar uploaded successfully!");
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      let errorMessage = "Failed to upload avatar";
+      if (err.data?.message) {
+        errorMessage = err.data.message;
+      } else if (err.data?.error) {
+        errorMessage = err.data.error;
+      }
+      toast.error(errorMessage);
+      setSelectedAvatarFile(null);
+      e.target.value = ""; // Reset file input
     }
   };
 
@@ -462,181 +496,248 @@ export default function ProfilePage() {
   }
 
   return (
-    <Container>
-      {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200">
-        <nav className="flex space-x-8" aria-label="Tabs">
-          <button
-            onClick={() => setActiveTab("profile")}
-            className={`
-              py-4 px-1 border-b-2 font-medium text-sm
-              ${
-                activeTab === "profile"
-                  ? "border-green-600 text-green-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }
-            `}
-          >
-            {t("profile")}
-          </button>
-          <button
-            onClick={() => setActiveTab("products")}
-            className={`
-              py-4 px-1 border-b-2 font-medium text-sm
-              ${
-                activeTab === "products"
-                  ? "border-green-600 text-green-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }
-            `}
-          >
-            {t("products")}
-          </button>
-        </nav>
-      </div>
+    <div className="min-h-screen bg-black">
+      <Container>
+        {/* Tabs */}
+        <div className="mb-6 border-b border-gray-700">
+          <nav className="flex space-x-8" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab("profile")}
+              className={`
+                py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                ${
+                  activeTab === "profile"
+                    ? "border-green-500 text-green-500"
+                    : "border-transparent text-gray-400 hover:text-gray-300"
+                }
+              `}
+            >
+              {t("profile")}
+            </button>
+            <button
+              onClick={() => setActiveTab("products")}
+              className={`
+                py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                ${
+                  activeTab === "products"
+                    ? "border-green-500 text-green-500"
+                    : "border-transparent text-gray-400 hover:text-gray-300"
+                }
+              `}
+            >
+              {t("products")}
+            </button>
+          </nav>
+        </div>
 
       {activeTab === "profile" && (
         <div className="space-y-6">
           {/* Profile Information */}
-          <Card title={t("profileInformation")}>
-          <div className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">{t("email")}</label>
-              <Input
-                type="email"
-                value={profile.email}
-                disabled
-                className="bg-gray-50"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                {profile.emailVerified ? (
-                  <span className="text-green-600">✓ {t("emailVerified")}</span>
-                ) : (
-                  <span className="text-red-600">✗ {t("emailNotVerified")}</span>
-                )}
-              </p>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">{t("phone")}</label>
-              <div className="flex gap-2">
-                <Input
-                  type="tel"
-                  value={profile.phone}
-                  disabled
-                  className="bg-gray-50 flex-1"
-                />
-                {!profile.phoneVerified && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleOpenPhoneModal}
-                  >
-                    {t("verifyPhone")}
-                  </Button>
-                )}
-              </div>
-              <p className="mt-1 text-xs text-gray-500">
-                {profile.phoneVerified ? (
-                  <span className="text-green-600">✓ {t("phoneVerified")}</span>
-                ) : (
-                  <span className="text-red-600">✗ {t("phoneNotVerified")}</span>
-                )}
-              </p>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">{t("fullName")}</label>
-              <Input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder={t("enterFullName")}
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">{t("region")}</label>
-              <Input
-                type="text"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                placeholder={t("enterRegion")}
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-900">{t("preferredLanguage")}</label>
-              <select
-                value={preferredLanguage}
-                onChange={(e) => setPreferredLanguage(e.target.value as "en" | "es" | "fr")}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600"
-              >
-                <option value="en">{t("english")}</option>
-                <option value="es">{t("spanish")}</option>
-                <option value="fr">{t("french")}</option>
-              </select>
-            </div>
-
-            <Button
-              className="w-full"
-              onClick={handleUpdateProfile}
-              disabled={isUpdatingProfile}
-            >
-              {isUpdatingProfile ? (
-                <span className="flex items-center gap-2">
-                  <Spinner /> {t("updating")}
-                </span>
-              ) : (
-                t("updateProfile")
-              )}
-            </Button>
-          </div>
-        </Card>
-
-        {/* Roles Management */}
-        <Card title={t("selectRole")}>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              {["BUYER", "SELLER", "WISHLIST"].map((role) => {
-                const roleLabels: Record<string, string> = {
-                  BUYER: t("buyer"),
-                  SELLER: t("seller"),
-                  WISHLIST: t("wishlist"),
-                };
-                return (
-                  <label key={role} className="flex items-center gap-2 cursor-pointer">
+          <div className="bg-gray-800 rounded-xl border border-green-500/30 p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-6">{t("profileInformation")}</h2>
+            <div className="space-y-5">
+              {/* Avatar Upload */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">Profile Avatar</label>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    {avatar ? (
+                      <img
+                        src={avatar}
+                        alt="Profile avatar"
+                        className="w-20 h-20 rounded-full border-2 border-gray-600 object-cover"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-gray-700 border-2 border-gray-600 flex items-center justify-center">
+                        <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
                     <input
-                      type="checkbox"
-                      checked={selectedRoles.includes(role)}
-                      onChange={() => toggleRole(role)}
-                      className="rounded border-gray-300 text-green-600 focus:ring-green-600"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarFileChange}
+                      className="hidden"
+                      id="avatar-upload"
                     />
-                    <span className="text-sm text-gray-900">{roleLabels[role]}</span>
-                  </label>
-                );
-              })}
-            </div>
-            {selectedRoles.length === 0 && (
-              <p className="text-xs text-red-600">{t("pleaseSelectRole")}</p>
-            )}
+                    <label
+                      htmlFor="avatar-upload"
+                      className="inline-block px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg cursor-pointer transition-colors text-sm font-medium"
+                    >
+                      {avatar ? "Change Avatar" : "Upload Avatar"}
+                    </label>
+                    {selectedAvatarFile && (
+                      <p className="mt-1 text-xs text-gray-400">
+                        {selectedAvatarFile.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleUpdateRoles}
-              disabled={isUpdatingRoles || selectedRoles.length === 0}
-            >
-              {isUpdatingRoles ? (
-                <span className="flex items-center gap-2">
-                  <Spinner /> {t("updating")}
-                </span>
-              ) : (
-                t("updateRoles") || "Update Roles"
-              )}
-            </Button>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">{t("email")}</label>
+                <Input
+                  type="email"
+                  value={profile.email}
+                  disabled
+                  className="bg-gray-700 border-gray-600 text-white"
+                />
+                <p className="mt-2 text-xs flex items-center gap-1.5">
+                  {profile.emailVerified ? (
+                    <span className="text-green-500 flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {t("emailVerified")}
+                    </span>
+                  ) : (
+                    <span className="text-red-500 flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      {t("emailNotVerified")}
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">{t("phone")}</label>
+                <div className="flex gap-2">
+                  <Input
+                    type="tel"
+                    value={profile.phone}
+                    disabled
+                    className="bg-gray-700 border-gray-600 text-white flex-1"
+                  />
+                  {!profile.phoneVerified && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleOpenPhoneModal}
+                      className="bg-gray-700 border-gray-600 text-white hover:bg-gray-600 whitespace-nowrap"
+                    >
+                      {t("verifyPhone")}
+                    </Button>
+                  )}
+                </div>
+                <p className="mt-2 text-xs flex items-center gap-1.5">
+                  {profile.phoneVerified ? (
+                    <span className="text-green-500 flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {t("phoneVerified")}
+                    </span>
+                  ) : (
+                    <span className="text-red-500 flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      {t("phoneNotVerified")}
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">{t("fullName")}</label>
+                <Input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder={t("enterFullName")}
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">{t("region")}</label>
+                <Input
+                  type="text"
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  placeholder={t("enterRegion")}
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">{t("preferredLanguage")}</label>
+                <select
+                  value={preferredLanguage}
+                  onChange={(e) => setPreferredLanguage(e.target.value as "en" | "es" | "fr")}
+                  className="w-full rounded-lg border border-gray-600 bg-gray-700 text-white px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="en" className="bg-gray-700">{t("english")}</option>
+                  <option value="es" className="bg-gray-700">{t("spanish")}</option>
+                  <option value="fr" className="bg-gray-700">{t("french")}</option>
+                </select>
+              </div>
+
+              <Button
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium mt-2"
+                onClick={handleUpdateProfile}
+                disabled={isUpdatingProfile}
+              >
+                {isUpdatingProfile ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Spinner /> {t("updating")}
+                  </span>
+                ) : (
+                  t("updateProfile")
+                )}
+              </Button>
+            </div>
           </div>
-        </Card>
+
+          {/* Roles Management */}
+          <div className="bg-gray-800 rounded-xl border border-green-500/30 p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-6">{t("selectRole")}</h2>
+            <div className="space-y-4">
+              <div className="space-y-3">
+                {["BUYER", "SELLER", "WISHLIST"].map((role) => {
+                  const roleLabels: Record<string, string> = {
+                    BUYER: t("buyer"),
+                    SELLER: t("seller"),
+                    WISHLIST: t("wishlist"),
+                  };
+                  return (
+                    <label key={role} className="flex items-center gap-3 cursor-pointer hover:bg-gray-700/50 p-2 rounded-lg transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={selectedRoles.includes(role)}
+                        onChange={() => toggleRole(role)}
+                        className="w-5 h-5 rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500 focus:ring-2 cursor-pointer"
+                      />
+                      <span className="text-sm text-gray-300">{roleLabels[role]}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              {selectedRoles.length === 0 && (
+                <p className="text-xs text-red-500">{t("pleaseSelectRole")}</p>
+              )}
+
+              <Button
+                className="w-full bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-medium border border-gray-600"
+                onClick={handleUpdateRoles}
+                disabled={isUpdatingRoles || selectedRoles.length === 0}
+              >
+                {isUpdatingRoles ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Spinner /> {t("updating")}
+                  </span>
+                ) : (
+                  t("updateRoles") || "Update Roles"
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -646,9 +747,10 @@ export default function ProfilePage() {
           {isSeller ? (
             <>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h2 className="text-xl font-semibold text-gray-900">{t("products")}</h2>
+                <h2 className="text-xl font-semibold text-white">{t("products")}</h2>
                 <Button
                   onClick={() => setIsCreatePostModalOpen(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white"
                 >
                   {t("createNewPost")}
                 </Button>
@@ -661,16 +763,16 @@ export default function ProfilePage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t("searchProducts")}
-                  className="w-full"
+                  className="w-full bg-gray-800 border-gray-700 text-white"
                 />
               </div>
 
               {isLoadingPosts ? (
-                <Card>
+                <div className="bg-gray-800 rounded-xl border border-gray-700 p-8">
                   <div className="flex items-center justify-center py-8">
                     <Spinner />
                   </div>
-                </Card>
+                </div>
               ) : postsData?.posts && postsData.posts.length > 0 ? (
                 <>
                   <div className="mb-4 text-sm text-gray-400">
@@ -1067,6 +1169,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </Modal>
-    </Container>
+      </Container>
+    </div>
   );
 }

@@ -12,6 +12,7 @@ export type UserProfile = {
   notifyEmail: boolean;
   notifySms: boolean;
   notifyInApp: boolean;
+  avatar?: string | null;
   roles?: string[];
   createdAt: string;
 };
@@ -20,6 +21,7 @@ export type UpdateProfileRequest = {
   fullName?: string;
   region?: string;
   preferredLanguage?: "en" | "es" | "fr";
+  avatar?: string;
 };
 
 export type UpdatePreferencesRequest = {
@@ -38,6 +40,16 @@ export type UpdateRolesResponse = {
   refreshToken?: string;
 };
 
+export type PublicUserProfile = {
+  id: string;
+  email: string;
+  fullName: string | null;
+  createdAt: string;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  avatar?: string | null;
+};
+
 export const userApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getProfile: builder.query<UserProfile, void>({
@@ -46,6 +58,13 @@ export const userApi = api.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["User"],
+    }),
+    getUserById: builder.query<{ user: PublicUserProfile }, string>({
+      query: (userId) => ({
+        url: `/users/${userId}`,
+        method: "GET",
+      }),
+      providesTags: (result, error, userId) => [{ type: "User", id: userId }],
     }),
     updateProfile: builder.mutation<UserProfile, UpdateProfileRequest>({
       query: (body) => ({
@@ -76,4 +95,4 @@ export const userApi = api.injectEndpoints({
   }),
 });
 
-export const { useGetProfileQuery, useUpdateProfileMutation, useUpdatePreferencesMutation, useUpdateRolesMutation } = userApi;
+export const { useGetProfileQuery, useGetUserByIdQuery, useUpdateProfileMutation, useUpdatePreferencesMutation, useUpdateRolesMutation } = userApi;
