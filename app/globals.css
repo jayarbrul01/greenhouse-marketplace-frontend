@@ -35,9 +35,9 @@ body {
   color: #ffffff !important;
 }
 
-.modern-bg * {
+/* .modern-bg * {
   color: inherit;
-}
+} */
 
 .modern-bg h1,
 .modern-bg h2,
@@ -54,6 +54,21 @@ body {
 .modern-bg label,
 .modern-bg div {
   color: #e5e7eb !important;
+}
+
+/* Exclude hero section from modern-bg text color overrides */
+.hero-section * {
+  color: inherit !important;
+}
+
+.hero-section label,
+.hero-section p,
+.hero-section span,
+.hero-section div,
+.hero-section button,
+.hero-section input,
+.hero-section select {
+  color: inherit !important;
 }
 
 /* Subtle texture overlay for depth */
@@ -129,32 +144,61 @@ footer {
   height: 1.5rem;
 }
 
-/* Dark mode input styling - apply to all inputs */
-input,
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="password"],
-input[type="number"] {
+/* Dark mode input styling - apply to all inputs except hero inputs */
+input:not(.hero-input),
+input[type="text"]:not(.hero-input),
+input[type="email"]:not(.hero-input),
+input[type="tel"]:not(.hero-input),
+input[type="password"]:not(.hero-input),
+input[type="number"]:not(.hero-input) {
   background-color: #1f2937 !important;
   color: #f3f4f6 !important;
   border-color: #4b5563 !important;
   -webkit-text-fill-color: #f3f4f6 !important;
 }
 
+/* Hero input styling - white background for hero section */
+input.hero-input,
+input[type="text"].hero-input,
+input[type="email"].hero-input,
+input[type="tel"].hero-input,
+input[type="password"].hero-input,
+input[type="number"].hero-input {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
 /* Webkit autofill override - comprehensive coverage */
-input:-webkit-autofill,
-input[type="text"]:-webkit-autofill,
-input[type="email"]:-webkit-autofill,
-input[type="tel"]:-webkit-autofill,
-input[type="password"]:-webkit-autofill,
-input[type="number"]:-webkit-autofill {
+input:-webkit-autofill:not(.hero-input),
+input[type="text"]:-webkit-autofill:not(.hero-input),
+input[type="email"]:-webkit-autofill:not(.hero-input),
+input[type="tel"]:-webkit-autofill:not(.hero-input),
+input[type="password"]:-webkit-autofill:not(.hero-input),
+input[type="number"]:-webkit-autofill:not(.hero-input) {
   background-color: #1f2937 !important;
   color: #f3f4f6 !important;
   border-color: #4b5563 !important;
   -webkit-text-fill-color: #f3f4f6 !important;
   -webkit-box-shadow: 0 0 0px 1000px #1f2937 inset !important;
   box-shadow: 0 0 0px 1000px #1f2937 inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Hero input autofill */
+input.hero-input:-webkit-autofill,
+input[type="text"].hero-input:-webkit-autofill,
+input[type="email"].hero-input:-webkit-autofill,
+input[type="tel"].hero-input:-webkit-autofill,
+input[type="password"].hero-input:-webkit-autofill,
+input[type="number"].hero-input:-webkit-autofill {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+  -webkit-text-fill-color: #111827 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
   transition: background-color 5000s ease-in-out 0s !important;
 }
 
@@ -200,6 +244,16 @@ input[type="number"]::placeholder {
   color: #6b7280 !important;
 }
 
+/* Hero input placeholders - darker for better contrast */
+input.hero-input::placeholder,
+input.hero-input[type="text"]::placeholder,
+input.hero-input[type="email"]::placeholder,
+input.hero-input[type="tel"]::placeholder,
+input.hero-input[type="password"]::placeholder,
+input.hero-input[type="number"]::placeholder {
+  color: #9ca3af !important;
+}
+
 /* Dark mode checkbox styling */
 input[type="checkbox"] {
   appearance: none;
@@ -242,18 +296,36 @@ input[type="checkbox"]:checked:hover {
 }
 
 /* Dark mode select/option styling */
-select {
+select:not(.hero-select) {
   background-color: #1f2937 !important;
   color: #f3f4f6 !important;
   border-color: #4b5563 !important;
 }
 
-select option {
+select:not(.hero-select) option {
   background-color: #1f2937 !important;
   color: #f3f4f6 !important;
 }
 
-select:focus {
+select:not(.hero-select):focus {
+  border-color: #22c55e !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
+}
+
+/* Hero select styling - white background for hero section */
+select.hero-select {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+}
+
+select.hero-select option {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+select.hero-select:focus {
   border-color: #22c55e !important;
   outline: none !important;
   box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3) !important;

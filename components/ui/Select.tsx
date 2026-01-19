@@ -12,11 +12,11 @@ export function Select({
   ...props
 }: Props) {
   const base =
-    "rounded-lg font-medium transition focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-800 text-gray-100";
+    "rounded-lg font-medium transition focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants: Record<NonNullable<Props["variant"]>, string> = {
-    primary: "border border-green-600 hover:border-green-500",
-    outline: "border border-gray-600 hover:border-gray-500",
+    primary: "border border-green-600 hover:border-green-500 bg-gray-800 text-gray-100",
+    outline: "border border-gray-600 hover:border-gray-500 bg-gray-800 text-gray-100",
   };
 
   const sizes: Record<NonNullable<Props["size"]>, string> = {

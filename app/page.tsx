@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { Input } from "@/components/ui/Input";
@@ -42,9 +43,27 @@ export default function HomePage() {
     { key: "consultationCategory", label: t("consultationCategory"), icon: "💡" },
   ];
 
+  // Fetch product counts for each category
+  const equipmentCount = useGetAllPostsQuery({ category: t("equipmentCategory"), limit: 1 }, { skip: false });
+  const jobsCount = useGetAllPostsQuery({ category: t("jobsCategory"), limit: 1 }, { skip: false });
+  const packagingCount = useGetAllPostsQuery({ category: t("packagingMaterialCategory"), limit: 1 }, { skip: false });
+  const farmingMachinesCount = useGetAllPostsQuery({ category: t("farmingMachinesCategory"), limit: 1 }, { skip: false });
+  const freeStuffCount = useGetAllPostsQuery({ category: t("freeStuffCategory"), limit: 1 }, { skip: false });
+  const consultationCount = useGetAllPostsQuery({ category: t("consultationCategory"), limit: 1 }, { skip: false });
+
+  // Map category keys to their counts
+  const categoryCounts: Record<string, number> = {
+    equipmentCategory: equipmentCount.data?.total ?? 0,
+    jobsCategory: jobsCount.data?.total ?? 0,
+    packagingMaterialCategory: packagingCount.data?.total ?? 0,
+    farmingMachinesCategory: farmingMachinesCount.data?.total ?? 0,
+    freeStuffCategory: freeStuffCount.data?.total ?? 0,
+    consultationCategory: consultationCount.data?.total ?? 0,
+  };
+
   const [selectedCategory, setSelectedCategory] = useState<string>(allCategoriesText);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedRegion, setSelectedRegion] = useState<string>("");
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,14 +75,91 @@ export default function HomePage() {
   // Region options
   const allRegionsText = t("allRegions");
   const regions = [
-    { value: "", label: allRegionsText },
-    { value: t("northAmerica"), label: t("northAmerica") },
-    { value: t("southAmerica"), label: t("southAmerica") },
-    { value: t("europe"), label: t("europe") },
-    { value: t("asia"), label: t("asia") },
-    { value: t("africa"), label: t("africa") },
-    { value: t("oceania"), label: t("oceania") },
+    allRegionsText,
+    t("northAmerica"),
+    t("southAmerica"),
+    t("europe"),
+    t("asia"),
+    t("africa"),
+    t("oceania"),
   ];
+
+  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
+  const regionButtonRef = useRef<HTMLButtonElement>(null);
+  const regionDropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Calculate dropdown position
+  useEffect(() => {
+    if (isLocationDropdownOpen && regionButtonRef.current && mounted) {
+      const calculatePosition = () => {
+        if (!regionButtonRef.current) return;
+        
+        const buttonRect = regionButtonRef.current.getBoundingClientRect();
+        const spacing = 4; // mt-1 = 4px
+        
+        setDropdownPosition({
+          top: buttonRect.bottom + spacing,
+          left: buttonRect.left,
+          width: buttonRect.width,
+        });
+      };
+
+      calculatePosition();
+      window.addEventListener('scroll', calculatePosition, true);
+      window.addEventListener('resize', calculatePosition);
+
+      return () => {
+        window.removeEventListener('scroll', calculatePosition, true);
+        window.removeEventListener('resize', calculatePosition);
+      };
+    } else {
+      setDropdownPosition(null);
+    }
+  }, [isLocationDropdownOpen, mounted]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isLocationDropdownOpen && 
+          !target.closest('.region-dropdown-container') && 
+          !target.closest('.region-dropdown-portal')) {
+        setIsLocationDropdownOpen(false);
+      }
+    };
+
+    if (isLocationDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isLocationDropdownOpen]);
+
+  const handleRegionToggle = (region: string) => {
+    if (region === allRegionsText) return;
+    
+    setSelectedRegions(prev => {
+      const newRegions = prev.includes(region)
+        ? prev.filter(r => r !== region)
+        : [...prev, region];
+      
+      setCurrentPage(1);
+      // Automatically trigger search when region changes
+      if (newRegions.length > 0 || searchQuery || selectedCategory !== allCategoriesText || minPrice || maxPrice) {
+        setIsSearching(true);
+      } else {
+        setIsSearching(false);
+      }
+      
+      return newRegions;
+    });
+  };
 
   const handleCategoryClick = (categoryLabel: string) => {
     router.push(`/products?category=${encodeURIComponent(categoryLabel)}`);
@@ -72,6 +168,16 @@ export default function HomePage() {
   const handleTabChange = (categoryLabel: string) => {
     setSelectedCategory(categoryLabel);
     setCurrentPage(1);
+    // Automatically trigger search when category changes (if not "All Categories" or if other filters are set)
+    if (categoryLabel !== allCategoriesText) {
+      setIsSearching(true);
+    } else if (searchQuery || selectedRegions.length > 0 || minPrice || maxPrice) {
+      // If "All Categories" but other filters exist, keep searching
+      setIsSearching(true);
+    } else {
+      // If "All Categories" and no other filters, stop searching
+      setIsSearching(false);
+    }
   };
 
   const handleSearch = () => {
@@ -90,7 +196,7 @@ export default function HomePage() {
     const params: {
       q?: string;
       category?: string;
-      region?: string;
+      region?: string | string[];
       minPrice?: number;
       maxPrice?: number;
       page: number;
@@ -100,30 +206,35 @@ export default function HomePage() {
       limit: ITEMS_PER_PAGE,
     };
 
+    // Include search query if it exists and we're searching
     if (debouncedSearchQuery && isSearching) {
       params.q = debouncedSearchQuery;
     }
 
-    if (selectedCategory && selectedCategory !== allCategoriesText) {
+    // Include category if selected and not "All Categories"
+    if (selectedCategory && selectedCategory !== allCategoriesText && isSearching) {
       params.category = selectedCategory;
     }
 
-    if (selectedRegion) {
-      params.region = selectedRegion;
+    // Include regions if selected
+    if (selectedRegions.length > 0 && isSearching) {
+      params.region = selectedRegions;
     }
 
-    if (minPrice) {
+    // Include min price if provided
+    if (minPrice && isSearching) {
       const min = parseFloat(minPrice);
       if (!isNaN(min)) params.minPrice = min;
     }
 
-    if (maxPrice) {
+    // Include max price if provided
+    if (maxPrice && isSearching) {
       const max = parseFloat(maxPrice);
       if (!isNaN(max)) params.maxPrice = max;
     }
 
     return params;
-  }, [debouncedSearchQuery, isSearching, selectedCategory, selectedRegion, minPrice, maxPrice, currentPage, allCategoriesText]);
+  }, [debouncedSearchQuery, isSearching, selectedCategory, selectedRegions, minPrice, maxPrice, currentPage, allCategoriesText]);
 
   // Fetch search results only when searching
   const { data: searchResults, isLoading: isLoadingSearch } = useGetAllPostsQuery(
@@ -140,132 +251,177 @@ export default function HomePage() {
   const { data: recentProductsData, isLoading: isLoadingRecent } = useGetAllPostsQuery(recentProductsParams);
 
   return (
-    <Container>
-      <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
-          {t("browseListings")}
-        </h1>
-        <p className="text-gray-300">
-          Search all products or browse by category
-        </p>
-      </div>
-
-      {/* Main Search Block with Category Tabs */}
-      <div className="bg-black rounded-2xl shadow-2xl shadow-black/50 border border-gray-900/80 mb-8 overflow-hidden backdrop-blur-xl">
-        {/* Category Tabs */}
-        <div className="border-b border-gray-900/80 bg-black">
-          <div className="flex flex-wrap">
-            {categoryTabs.map((category) => {
-              const isActive = selectedCategory === category.label;
-              return (
-                <button
-                  key={category.key}
-                  onClick={() => handleTabChange(category.label)}
-                  className={`
-                    px-6 py-3 text-sm font-medium transition-all duration-200 border-b-2 whitespace-nowrap
-                    ${
-                      isActive
-                        ? "bg-green-600 border-green-500 font-bold text-white"
-                        : "bg-black text-gray-300 hover:bg-gray-950 hover:text-white border-transparent"
-                    }
-                  `}
-                >
-                  {category.label}
-                </button>
-              );
-            })}
-          </div>
+    <>
+      {/* Hero Search Section with Background Image */}
+      <div className="relative w-full min-h-[450px] sm:min-h-[500px] flex items-center justify-center mb-8 overflow-hidden rounded-b-3xl">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/hero_image.jpg)',
+          }}
+        >
+          {/* Dark Overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]"></div>
         </div>
 
-        {/* Search Options: Region, Price, Search Input and Button */}
-        <div className="p-4">
-          <div className="flex flex-col md:flex-row gap-3 items-end">
-            {/* Region Select */}
-            <div className="flex-1 w-full md:w-auto">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t("region")}
-              </label>
-              <Select
-                value={selectedRegion}
-                onChange={(e) => {
-                  setSelectedRegion(e.target.value);
-                  setIsSearching(false);
-                }}
-                className="w-full"
-              >
-                {regions.map((region) => (
-                  <option key={region.value} value={region.value}>
-                    {region.label}
-                  </option>
-                ))}
-              </Select>
+        {/* Content Container */}
+        <Container className="relative z-10 w-full">
+          <div className="max-w-6xl mx-auto">
+            {/* Hero Headline */}
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 drop-shadow-2xl">
+                {t("browseListings")}
+              </h1>
+              <p className="text-base sm:text-lg text-gray-200 font-medium">
+                Search all products or browse by category
+              </p>
             </div>
 
-            {/* Price Range */}
-            <div className="flex-1 w-full md:w-auto">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t("priceRange")}
-              </label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  placeholder={t("minPrice")}
-                  value={minPrice}
-                  onChange={(e) => {
-                    setMinPrice(e.target.value);
-                    setIsSearching(false);
-                  }}
-                  min="0"
-                  className="w-full"
-                />
-                <span className="text-gray-500 font-medium">-</span>
-                <Input
-                  type="number"
-                  placeholder={t("maxPrice")}
-                  value={maxPrice}
-                  onChange={(e) => {
-                    setMaxPrice(e.target.value);
-                    setIsSearching(false);
-                  }}
-                  min="0"
-                  className="w-full"
-                />
+            {/* Search Interface Card */}
+            <div className="bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 overflow-hidden max-w-6xl mx-auto">
+              {/* Category Tabs */}
+              <div className="bg-gray-50 border-b border-gray-200">
+                <div className="flex flex-wrap justify-center gap-2 px-4">
+                  {categoryTabs.map((category) => {
+                    const isActive = selectedCategory === category.label;
+                    return (
+                      <button
+                        key={category.key}
+                        onClick={() => handleTabChange(category.label)}
+                        className={`
+                          px-6 py-3 text-sm sm:text-base font-semibold transition-all duration-200 border-b-2 whitespace-nowrap
+                          ${
+                            isActive
+                              ? "bg-white border-green-600 text-gray-900"
+                              : "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-white/50 border-transparent"
+                          }
+                        `}
+                      >
+                        {category.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Search Options: Region, Price, Search Input and Button */}
+              <div className="p-4 sm:p-5">
+                <div className="flex flex-col lg:flex-row gap-3 items-end">
+                  {/* Region Multi-Select */}
+                  <div className="flex-1 w-full lg:w-auto relative region-dropdown-container">
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                      {t("region")}
+                    </label>
+                    <button
+                      ref={regionButtonRef}
+                      type="button"
+                      onClick={() => setIsLocationDropdownOpen(!isLocationDropdownOpen)}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-left hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors text-gray-900"
+                    >
+                      <svg className="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span className="flex-1 text-sm text-gray-900 truncate">
+                        {selectedRegions.length === 0
+                          ? allRegionsText
+                          : selectedRegions.length === 1
+                          ? selectedRegions[0]
+                          : `${selectedRegions.length} ${t("region")}s selected`}
+                      </span>
+                      <svg
+                        className={`w-4 h-4 text-gray-500 transition-transform flex-shrink-0 ${isLocationDropdownOpen ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Price Range */}
+                  <div className="flex-1 w-full lg:w-auto">
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                      {t("priceRange")}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        placeholder={t("minPrice")}
+                        value={minPrice}
+                        onChange={(e) => {
+                          setMinPrice(e.target.value);
+                          setCurrentPage(1);
+                          // Automatically trigger search when price changes
+                          if (e.target.value || maxPrice || searchQuery || selectedCategory !== allCategoriesText || selectedRegions.length > 0) {
+                            setIsSearching(true);
+                          } else {
+                            setIsSearching(false);
+                          }
+                        }}
+                        min="0"
+                        className="w-full hero-input"
+                        style={{ backgroundColor: '#ffffff', color: '#111827', borderColor: '#d1d5db' }}
+                      />
+                      <span className="text-gray-500 font-medium">-</span>
+                      <Input
+                        type="number"
+                        placeholder={t("maxPrice")}
+                        value={maxPrice}
+                        onChange={(e) => {
+                          setMaxPrice(e.target.value);
+                          setCurrentPage(1);
+                          // Automatically trigger search when price changes
+                          if (e.target.value || minPrice || searchQuery || selectedCategory !== allCategoriesText || selectedRegions.length > 0) {
+                            setIsSearching(true);
+                          } else {
+                            setIsSearching(false);
+                          }
+                        }}
+                        min="0"
+                        className="w-full hero-input"
+                        style={{ backgroundColor: '#ffffff', color: '#111827', borderColor: '#d1d5db' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Search Input */}
+                  <div className="flex-1 w-full lg:w-auto">
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                      {t("searchProducts")}
+                    </label>
+                    <Input
+                      placeholder={t("searchProducts")}
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setCurrentPage(1);
+                        // Automatically trigger search when query changes (after debounce)
+                        if (e.target.value || selectedCategory !== allCategoriesText || selectedRegions.length > 0 || minPrice || maxPrice) {
+                          setIsSearching(true);
+                        } else {
+                          setIsSearching(false);
+                        }
+                      }}
+                      onKeyPress={handleKeyPress}
+                      className="w-full hero-input"
+                      style={{ backgroundColor: '#ffffff', color: '#111827', borderColor: '#d1d5db' }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Search Input */}
-            <div className="flex-1 w-full md:w-auto">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t("searchProducts")}
-              </label>
-              <Input
-                placeholder={t("searchProducts")}
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsSearching(false);
-                }}
-                onKeyPress={handleKeyPress}
-                className="w-full"
-              />
-            </div>
-
-            {/* Search Button */}
-            <Button
-              onClick={handleSearch}
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-8 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 whitespace-nowrap h-fit min-w-[120px]"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              {t("search")}
-            </Button>
           </div>
-        </div>
+        </Container>
       </div>
 
+      {/* Main Content Container */}
+      <Container>
+
       {/* Search Results or Category Cards */}
-      {isSearching && (debouncedSearchQuery || selectedRegion || minPrice || maxPrice) ? (
+      {isSearching && (selectedCategory !== allCategoriesText || debouncedSearchQuery || selectedRegions.length > 0 || minPrice || maxPrice) ? (
         <div className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-100">
@@ -276,7 +432,7 @@ export default function HomePage() {
               onClick={() => {
                 setIsSearching(false);
                 setSearchQuery("");
-                setSelectedRegion("");
+                setSelectedRegions([]);
                 setMinPrice("");
                 setMaxPrice("");
                 setCurrentPage(1);
@@ -345,8 +501,15 @@ export default function HomePage() {
                       {category.label}
                     </h3>
                     
+                    {/* Product Count */}
+                    <div className="mb-3">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-500/20 text-green-400 border border-green-500/30">
+                        {categoryCounts[category.key] || 0} {categoryCounts[category.key] === 1 ? "product" : "products"}
+                      </span>
+                    </div>
+                    
                     {/* Arrow Icon */}
-                    <div className="mt-4 flex items-center gap-2 text-green-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="mt-2 flex items-center gap-2 text-green-400 opacity-0 group-hover:opacity-100 transition-opacity">
                       <span className="text-sm font-medium">View Products</span>
                       <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -394,6 +557,65 @@ export default function HomePage() {
           </div>
         </>
       )}
-    </Container>
+
+      {/* Region Dropdown Portal */}
+      {mounted && isLocationDropdownOpen && dropdownPosition && createPortal(
+        <div
+          ref={regionDropdownRef}
+          className="fixed z-[10000] region-dropdown-portal bg-white border border-gray-300 rounded-lg shadow-2xl max-h-60 overflow-y-auto min-h-[120px]"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+          }}
+        >
+          <div className="p-2">
+            <label className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer border-b border-gray-200 mb-1">
+              <input
+                type="checkbox"
+                checked={selectedRegions.length === regions.filter(reg => reg !== allRegionsText).length}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedRegions(regions.filter(reg => reg !== allRegionsText));
+                  } else {
+                    setSelectedRegions([]);
+                  }
+                  setCurrentPage(1);
+                  // Automatically trigger search when region changes
+                  if (e.target.checked || searchQuery || selectedCategory !== allCategoriesText || minPrice || maxPrice) {
+                    setIsSearching(true);
+                  } else {
+                    setIsSearching(false);
+                  }
+                }}
+                className="rounded border-gray-300 bg-white text-green-500 focus:ring-green-500 w-4 h-4"
+              />
+              <span className="text-sm font-semibold text-gray-900">
+                {selectedRegions.length === regions.filter(reg => reg !== allRegionsText).length
+                  ? "Deselect All"
+                  : "Select All"}
+              </span>
+            </label>
+            
+            {regions.filter(reg => reg !== allRegionsText).map((reg) => (
+              <label
+                key={reg}
+                className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedRegions.includes(reg)}
+                  onChange={() => handleRegionToggle(reg)}
+                  className="rounded border-gray-300 bg-white text-green-500 focus:ring-green-500 w-4 h-4"
+                />
+                <span className="text-sm text-gray-900">{reg}</span>
+              </label>
+            ))}
+          </div>
+        </div>,
+        document.body
+      )}
+      </Container>
+    </>
   );
 }
