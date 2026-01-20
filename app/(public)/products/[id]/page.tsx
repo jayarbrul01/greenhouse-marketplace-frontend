@@ -15,6 +15,9 @@ import { hydrateAuth } from "@/store/slices/auth.slice";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 import { ProductCard } from "@/components/marketplace/ProductCard";
+import { useAddToWishlistMutation, useRemoveFromWishlistMutation, useGetWishlistStatusQuery } from "@/store/api/wishlist.api";
+import { useGetProfileQuery } from "@/store/api/user.api";
+import toast from "react-hot-toast";
 
 export default function PublicProductDetailPage() {
   const { t } = useLanguage();
@@ -27,9 +30,17 @@ export default function PublicProductDetailPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
   const [offerAmount, setOfferAmount] = useState("");
-  const [likes, setLikes] = useState(72); // Mock likes count
+  const [isInWishlist, setIsInWishlist] = useState(false);
   
   const { data: postData, isLoading } = useGetPostQuery(postId);
+  const { data: profile } = useGetProfileQuery(undefined, { skip: !isAuthenticated });
+  const [addToWishlist, { isLoading: isAdding }] = useAddToWishlistMutation();
+  const [removeFromWishlist, { isLoading: isRemoving }] = useRemoveFromWishlistMutation();
+  
+  // Check wishlist status
+  const { data: wishlistStatus } = useGetWishlistStatusQuery([postId], {
+    skip: !isAuthenticated,
+  });
 
   // Fetch similar products (same category, excluding current product)
   const similarProductsParams = useMemo(() => {
@@ -58,6 +69,45 @@ export default function PublicProductDetailPage() {
     const token = getAccessToken();
     dispatch(hydrateAuth({ isAuthenticated: !!token }));
   }, [dispatch]);
+
+  // Update wishlist status when data changes
+  useEffect(() => {
+    if (wishlistStatus && wishlistStatus[postId]) {
+      setIsInWishlist(true);
+    } else {
+      setIsInWishlist(false);
+    }
+  }, [wishlistStatus, postId]);
+
+  // Handle wishlist click
+  const handleWishlistClick = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to add items to wishlist");
+      router.push("/login");
+      return;
+    }
+
+    // Check if user is trying to add their own product
+    if (profile && postData?.post && profile.id === postData.post.userId) {
+      toast.error("You cannot add your own products to your wishlist");
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist(postId).unwrap();
+        toast.success("Removed from wishlist");
+        setIsInWishlist(false);
+      } else {
+        await addToWishlist({ postId }).unwrap();
+        toast.success("Added to wishlist");
+        setIsInWishlist(true);
+      }
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || "Failed to update wishlist";
+      toast.error(errorMessage);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -142,11 +192,27 @@ export default function PublicProductDetailPage() {
 
                 {/* Action Buttons Overlay (Top Right) */}
                 <div className="absolute top-4 right-4 flex items-center gap-2">
-                  <button className="bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black/90 transition-colors">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <button
+                    onClick={handleWishlistClick}
+                    disabled={isAdding || isRemoving || (profile && postData?.post && profile.id === postData.post.userId)}
+                    className="bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                  >
+                    <svg
+                      className={`w-4 h-4 transition-colors duration-300 ${
+                        isInWishlist
+                          ? "text-red-500 fill-red-500"
+                          : "text-gray-400"
+                      }`}
+                      fill={isInWishlist ? "currentColor" : "none"}
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
-                    <span className="text-sm font-medium">{likes} likes</span>
+                    <span className="text-sm font-medium">
+                      {isInWishlist ? "In wishlist" : "Add to wishlist"}
+                    </span>
                   </button>
                 </div>
 
