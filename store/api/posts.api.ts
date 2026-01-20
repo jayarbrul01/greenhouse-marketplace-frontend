@@ -187,6 +187,7 @@ export const postsApi = api.injectEndpoints({
       invalidatesTags: (result, error, { postId }) => [
         { type: "Posts", id: postId },
         "Posts",
+        "Notifications",
       ],
     }),
     deletePost: builder.mutation<{ success: boolean }, string>({
@@ -194,7 +195,7 @@ export const postsApi = api.injectEndpoints({
         url: `/posts/${postId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Posts"],
+      invalidatesTags: ["Posts", "Notifications", "Wishlist"],
     }),
     uploadImage: builder.mutation<UploadFileResponse, FormData>({
       query: (formData) => ({

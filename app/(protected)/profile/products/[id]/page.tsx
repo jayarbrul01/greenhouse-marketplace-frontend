@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+import { Modal } from "@/components/ui/Modal";
 import { useGetPostQuery, useUpdatePostMutation, useDeletePostMutation, useUploadImageMutation, useUploadVideoMutation } from "@/store/api/posts.api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useGetProfileQuery } from "@/store/api/user.api";
@@ -27,6 +28,9 @@ export default function ProductDetailPage() {
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
   const [uploadImage, { isLoading: isUploadingImage }] = useUploadImageMutation();
   const [uploadVideo, { isLoading: isUploadingVideo }] = useUploadVideoMutation();
+  
+  // Delete confirmation modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const isSeller = profile?.roles?.includes("SELLER") || false;
   const canUpload = profile?.roles?.some((role: string) => ["SELLER", "BUYER", "WISHLIST"].includes(role)) || false;
@@ -162,11 +166,11 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleDeletePost = async () => {
-    if (!confirm("Are you sure you want to delete this product?")) {
-      return;
-    }
+  const handleDeletePost = () => {
+    setIsDeleteModalOpen(true);
+  };
 
+  const confirmDeletePost = async () => {
     try {
       await deletePost(postId).unwrap();
       toast.success("Product deleted successfully!");
@@ -202,7 +206,8 @@ export default function ProductDetailPage() {
   const post = postData.post;
 
   return (
-    <Container>
+    <>
+      <Container>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <Button variant="outline" onClick={() => router.push("/profile")}>
@@ -607,6 +612,40 @@ export default function ProductDetailPage() {
           )}
         </div>
       </div>
-    </Container>
+      </Container>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Delete Product"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-300">
+            Are you sure you want to delete this product? This action cannot be undone.
+          </p>
+          <p className="text-sm text-gray-400">
+            Users who have this product in their wishlist will be notified that it has been removed.
+          </p>
+          <div className="flex gap-3 justify-end pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(false)}
+              disabled={isDeleting}
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={confirmDeletePost}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? <Spinner /> : t("deletePost")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 }

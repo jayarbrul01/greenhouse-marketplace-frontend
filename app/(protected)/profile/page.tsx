@@ -14,6 +14,8 @@ import { useGetProfileQuery, useUpdateProfileMutation, useUpdateRolesMutation } 
 import { useCheckFirebasePhoneVerificationMutation } from "@/store/api/auth.api";
 import { setAccessToken } from "@/lib/auth";
 import { useCreatePostMutation, useGetUserPostsQuery, useDeletePostMutation, useUploadImageMutation, useUploadVideoMutation } from "@/store/api/posts.api";
+import { useGetWishlistQuery, useRemoveFromWishlistMutation } from "@/store/api/wishlist.api";
+import { ProductCard } from "@/components/marketplace/ProductCard";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useDebounce } from "@/hooks/useDebounce";
 import { auth } from "@/lib/firebase";
@@ -25,7 +27,7 @@ import toast from "react-hot-toast";
 export default function ProfilePage() {
   const { t } = useLanguage();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"profile" | "products">("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "products" | "wishlist">("profile");
   const { data: profile, isLoading, refetch } = useGetProfileQuery();
   const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
   const [updateRoles, { isLoading: isUpdatingRoles }] = useUpdateRolesMutation();
@@ -49,6 +51,14 @@ export default function ProfilePage() {
   const [deletePost, { isLoading: isDeletingPost }] = useDeletePostMutation();
   const [uploadImage, { isLoading: isUploadingImage }] = useUploadImageMutation();
   const [uploadVideo, { isLoading: isUploadingVideo }] = useUploadVideoMutation();
+  
+  // Wishlist state
+  const [wishlistPage, setWishlistPage] = useState(1);
+  const { data: wishlistData, isLoading: isLoadingWishlist, refetch: refetchWishlist } = useGetWishlistQuery({
+    page: wishlistPage,
+    limit: ITEMS_PER_PAGE,
+  });
+  const [removeFromWishlist] = useRemoveFromWishlistMutation();
   
   // Phone verification state
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
@@ -77,6 +87,10 @@ export default function ProfilePage() {
   const [postRegion, setPostRegion] = useState("");
   const [postImage, setPostImage] = useState("");
   const [postVideo, setPostVideo] = useState("");
+  
+  // Delete confirmation modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null);
 
@@ -311,15 +325,20 @@ export default function ProfilePage() {
     }
   };
 
-  const handleDeletePost = async (postId: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) {
-      return;
-    }
+  const handleDeletePost = (postId: string) => {
+    setPostToDelete(postId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeletePost = async () => {
+    if (!postToDelete) return;
 
     try {
-      await deletePost(postId).unwrap();
+      await deletePost(postToDelete).unwrap();
       toast.success("Post deleted successfully!");
       refetchPosts();
+      setIsDeleteModalOpen(false);
+      setPostToDelete(null);
     } catch (err: any) {
       const errorMessage = err.data?.message || err.message || "Failed to delete post.";
       toast.error(errorMessage);
@@ -527,6 +546,19 @@ export default function ProfilePage() {
               `}
             >
               {t("products")}
+            </button>
+            <button
+              onClick={() => setActiveTab("wishlist")}
+              className={`
+                py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                ${
+                  activeTab === "wishlist"
+                    ? "border-green-500 text-green-500"
+                    : "border-transparent text-gray-400 hover:text-gray-300"
+                }
+              `}
+            >
+              {t("wishlist")}
             </button>
           </nav>
         </div>
@@ -1170,7 +1202,87 @@ export default function ProfilePage() {
           </div>
         </div>
       </Modal>
+
+      {activeTab === "wishlist" && (
+        <div className="space-y-6">
+          <h2 className="text-xl font-semibold text-white">{t("wishlist")}</h2>
+
+          {isLoadingWishlist ? (
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-8">
+              <div className="flex items-center justify-center py-8">
+                <Spinner />
+              </div>
+            </div>
+          ) : wishlistData?.items && wishlistData.items.length > 0 ? (
+            <>
+              <div className="mb-4 text-sm text-gray-400">
+                Showing {((wishlistPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(wishlistPage * ITEMS_PER_PAGE, wishlistData.pagination.total)} of {wishlistData.pagination.total} items
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {wishlistData.items.map((post) => (
+                  <ProductCard key={post.id} post={post} />
+                ))}
+              </div>
+              {wishlistData.pagination.totalPages > 1 && (
+                <Pagination
+                  currentPage={wishlistPage}
+                  totalPages={wishlistData.pagination.totalPages}
+                  onPageChange={setWishlistPage}
+                />
+              )}
+            </>
+          ) : (
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-8 text-center">
+              <svg className="w-16 h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <p className="text-gray-400 text-lg font-medium mb-2">No items in wishlist</p>
+              <p className="text-gray-500 text-sm">Start adding products to your wishlist by clicking the heart icon on product cards.</p>
+            </div>
+          )}
+        </div>
+      )}
+
       </Container>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setPostToDelete(null);
+        }}
+        title="Delete Post"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-300">
+            Are you sure you want to delete this post? This action cannot be undone.
+          </p>
+          <p className="text-sm text-gray-400">
+            Users who have this product in their wishlist will be notified that it has been removed.
+          </p>
+          <div className="flex gap-3 justify-end pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setPostToDelete(null);
+              }}
+              disabled={isDeletingPost}
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={confirmDeletePost}
+              disabled={isDeletingPost}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeletingPost ? <Spinner /> : "Delete Post"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

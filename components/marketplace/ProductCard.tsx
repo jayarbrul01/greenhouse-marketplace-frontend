@@ -1,8 +1,56 @@
+"use client";
+
 import { Post } from "@/store/api/posts.api";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useAppSelector } from "@/store/hooks";
+import { useAddToWishlistMutation, useRemoveFromWishlistMutation, useGetWishlistStatusQuery } from "@/store/api/wishlist.api";
+import toast from "react-hot-toast";
 
 export function ProductCard({ post }: { post: Post & { user?: { id: string; fullName: string | null; email: string } } }) {
   const router = useRouter();
+  const { isAuthenticated } = useAppSelector((s) => s.auth);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [addToWishlist, { isLoading: isAdding }] = useAddToWishlistMutation();
+  const [removeFromWishlist, { isLoading: isRemoving }] = useRemoveFromWishlistMutation();
+  
+  // Check wishlist status
+  const { data: wishlistStatus } = useGetWishlistStatusQuery([post.id], {
+    skip: !isAuthenticated,
+  });
+
+  useEffect(() => {
+    if (wishlistStatus && wishlistStatus[post.id]) {
+      setIsInWishlist(true);
+    } else {
+      setIsInWishlist(false);
+    }
+  }, [wishlistStatus, post.id]);
+
+  const handleWishlistClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    
+    if (!isAuthenticated) {
+      toast.error("Please login to add items to wishlist");
+      router.push("/login");
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist(post.id).unwrap();
+        toast.success("Removed from wishlist");
+        setIsInWishlist(false);
+      } else {
+        await addToWishlist({ postId: post.id }).unwrap();
+        toast.success("Added to wishlist");
+        setIsInWishlist(true);
+      }
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || "Failed to update wishlist";
+      toast.error(errorMessage);
+    }
+  };
 
   return (
     <div 
@@ -39,6 +87,32 @@ export function ProductCard({ post }: { post: Post & { user?: { id: string; full
             </span>
           </div>
         )}
+
+        {/* Wishlist Heart Icon */}
+        <button
+          onClick={handleWishlistClick}
+          disabled={isAdding || isRemoving}
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/95 backdrop-blur-md border border-gray-900/80 hover:border-red-500/60 transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <svg
+            className={`w-5 h-5 transition-colors duration-300 ${
+              isInWishlist
+                ? "text-red-500 fill-red-500"
+                : "text-gray-400 hover:text-red-400"
+            }`}
+            fill={isInWishlist ? "currentColor" : "none"}
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
+          </svg>
+        </button>
 
         {/* Price Overlay on Hover */}
         {post.price != null && (

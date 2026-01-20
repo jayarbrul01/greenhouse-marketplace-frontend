@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useGetUnreadNotificationsQuery, useMarkAsReadMutation, Notification } from "@/store/api/notifications.api";
+import { postsApi } from "@/store/api/posts.api";
+import { useAppDispatch } from "@/store/hooks";
 import { Spinner } from "@/components/ui/Spinner";
+import toast from "react-hot-toast";
 // Simple date formatter
 function formatTimeAgo(date: string): string {
   const now = new Date();
@@ -29,6 +32,7 @@ export function NotificationDropdown({ isOpen, onClose, buttonRef }: Notificatio
   const [position, setPosition] = useState<{ top: number; right: number } | null>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { data, isLoading, refetch } = useGetUnreadNotificationsQuery(undefined, {
     skip: !isOpen, // Only fetch when dropdown is open
   });
@@ -142,10 +146,16 @@ export function NotificationDropdown({ isOpen, onClose, buttonRef }: Notificatio
 
     // Navigate to product detail page if postId exists
     if (notification.postId) {
+      // Invalidate the post cache to ensure fresh data is fetched
+      dispatch(postsApi.util.invalidateTags([{ type: "Posts", id: notification.postId }]));
+      
       router.push(`/products/${notification.postId}`);
       onClose();
     } else {
-      // If no postId, just close the dropdown
+      // If no postId (e.g., deleted post), show message and close dropdown
+      if (notification.title === "Product Removed") {
+        toast("This product has been removed and is no longer available.");
+      }
       onClose();
     }
   };
