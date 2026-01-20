@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useGetPostQuery } from "@/store/api/posts.api";
+import { useGetPostQuery, useGetAllPostsQuery } from "@/store/api/posts.api";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { getAccessToken } from "@/lib/auth";
 import { hydrateAuth } from "@/store/slices/auth.slice";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
+import { ProductCard } from "@/components/marketplace/ProductCard";
 
 export default function PublicProductDetailPage() {
   const { t } = useLanguage();
@@ -29,6 +30,27 @@ export default function PublicProductDetailPage() {
   const [likes, setLikes] = useState(72); // Mock likes count
   
   const { data: postData, isLoading } = useGetPostQuery(postId);
+
+  // Fetch similar products (same category, excluding current product)
+  const similarProductsParams = useMemo(() => {
+    if (!postData?.post?.category) return undefined;
+    return {
+      category: postData.post.category,
+      page: 1,
+      limit: 6, // Show up to 6 similar products
+    };
+  }, [postData?.post?.category]);
+
+  const { data: similarProductsData, isLoading: isLoadingSimilar } = useGetAllPostsQuery(
+    similarProductsParams || undefined,
+    { skip: !similarProductsParams }
+  );
+
+  // Filter out current product from similar products
+  const similarProducts = useMemo(() => {
+    if (!similarProductsData?.posts) return [];
+    return similarProductsData.posts.filter((p) => p.id !== postId);
+  }, [similarProductsData?.posts, postId]);
 
   // Check authentication on mount
   useEffect(() => {
@@ -362,6 +384,45 @@ export default function PublicProductDetailPage() {
                     </button>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Similar Products Section */}
+            {post.category && similarProducts.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-2xl font-bold text-white">Similar Products</h2>
+                  <div className="flex-1 h-px bg-gray-700"></div>
+                </div>
+                
+                {isLoadingSimilar ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Spinner />
+                    <span className="ml-3 text-sm text-gray-400">Loading similar products...</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                      {similarProducts.map((similarPost) => (
+                        <ProductCard key={similarPost.id} post={similarPost} />
+                      ))}
+                    </div>
+                    
+                    {/* View More Button */}
+                    <div className="flex justify-center pt-4">
+                      <Button
+                        onClick={() => router.push(`/products?category=${encodeURIComponent(post.category!)}`)}
+                        variant="outline"
+                        className="px-6 py-3 text-base font-medium"
+                      >
+                        View More Products in {post.category}
+                        <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
