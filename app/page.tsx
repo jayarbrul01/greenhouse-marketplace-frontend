@@ -16,6 +16,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 
 const RECENT_PRODUCTS_LIMIT = 12;
 const ITEMS_PER_PAGE = 12;
+const INITIAL_PRODUCTS_DISPLAY = 6; // Show 6 products initially
+const PRODUCTS_TO_LOAD_MORE = 6; // Load 6 more each time
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -68,6 +70,7 @@ export default function HomePage() {
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isSearching, setIsSearching] = useState(false);
+  const [displayedProductsCount, setDisplayedProductsCount] = useState(INITIAL_PRODUCTS_DISPLAY);
 
   // Debounce search query
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -243,12 +246,22 @@ export default function HomePage() {
   );
 
   // Fetch recent products (newest first, no filters)
+  // Fetch enough products to cover what we want to display, with some buffer
   const recentProductsParams = useMemo(() => ({
     page: 1,
-    limit: RECENT_PRODUCTS_LIMIT,
-  }), []);
+    limit: Math.max(RECENT_PRODUCTS_LIMIT, displayedProductsCount + PRODUCTS_TO_LOAD_MORE),
+  }), [displayedProductsCount]);
 
   const { data: recentProductsData, isLoading: isLoadingRecent } = useGetAllPostsQuery(recentProductsParams);
+
+  // Get the products to display (slice to show only the count we want)
+  const displayedProducts = recentProductsData?.posts?.slice(0, displayedProductsCount) || [];
+  const hasMoreProducts = (recentProductsData?.posts?.length || 0) > displayedProductsCount || 
+                          (recentProductsData?.total || 0) > displayedProductsCount;
+
+  const handleViewMore = () => {
+    setDisplayedProductsCount(prev => prev + PRODUCTS_TO_LOAD_MORE);
+  };
 
   return (
     <>
@@ -541,12 +554,40 @@ export default function HomePage() {
                 <Spinner />
                 <span className="ml-3 text-sm text-gray-400">Loading products...</span>
               </div>
-            ) : recentProductsData?.posts && recentProductsData.posts.length > 0 ? (
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {recentProductsData.posts.map((post) => (
-                  <ProductCard key={post.id} post={post} />
-                ))}
-              </div>
+            ) : displayedProducts && displayedProducts.length > 0 ? (
+              <>
+                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 mb-6">
+                  {displayedProducts.map((post) => (
+                    <ProductCard key={post.id} post={post} />
+                  ))}
+                </div>
+                
+                {/* View More Button */}
+                {hasMoreProducts && (
+                  <div className="flex justify-center mt-6">
+                    <Button
+                      onClick={handleViewMore}
+                      variant="outline"
+                      className="px-6 py-3 text-base font-medium"
+                      disabled={isLoadingRecent}
+                    >
+                      {isLoadingRecent ? (
+                        <>
+                          <Spinner />
+                          <span className="ml-2">Loading...</span>
+                        </>
+                      ) : (
+                        <>
+                          View More Products
+                          <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="bg-black border border-gray-900/80 rounded-lg p-8 text-center">
                 <p className="text-sm text-gray-400">
