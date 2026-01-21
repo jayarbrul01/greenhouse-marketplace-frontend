@@ -12,7 +12,7 @@ export function Footer() {
   return (
     <footer className="border-t border-gray-900/80 bg-black backdrop-blur-xl shadow-2xl shadow-black/50 mt-auto !z-0">
       <Container className="py-4 sm:py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-4 sm:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-4 sm:mb-6">
           {/* Brand Section */}
           <div className="sm:col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-3 group">
@@ -55,6 +55,43 @@ export function Footer() {
               <li>
                 <Link href="/signup" className="text-xs sm:text-sm text-gray-300 hover:text-green-400 transition">
                   {t("signUp")}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Categories */}
+          <div>
+            <h3 className="text-xs sm:text-sm font-semibold text-white mb-2 sm:mb-3">{t("categories")}</h3>
+            <ul className="space-y-1.5 sm:space-y-2">
+              <li>
+                <Link href="/products?category=Equipment" className="text-xs sm:text-sm text-gray-300 hover:text-green-400 transition">
+                  {t("equipmentCategory")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=Jobs" className="text-xs sm:text-sm text-gray-300 hover:text-green-400 transition">
+                  {t("jobsCategory")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=Packaging Material" className="text-xs sm:text-sm text-gray-300 hover:text-green-400 transition">
+                  {t("packagingMaterialCategory")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=Farming Machines" className="text-xs sm:text-sm text-gray-300 hover:text-green-400 transition">
+                  {t("farmingMachinesCategory")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=Free Stuff" className="text-xs sm:text-sm text-gray-300 hover:text-green-400 transition">
+                  {t("freeStuffCategory")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/products?category=Consultation" className="text-xs sm:text-sm text-gray-300 hover:text-green-400 transition">
+                  {t("consultationCategory")}
                 </Link>
               </li>
             </ul>
