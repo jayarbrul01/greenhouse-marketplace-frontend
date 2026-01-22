@@ -81,6 +81,17 @@ export const advertisementsApi = api.injectEndpoints({
         method: "POST",
       }),
     }),
+    updateAdvertisement: builder.mutation<
+      { advertisement: Advertisement },
+      { id: string; status?: string; startDate?: string; endDate?: string }
+    >({
+      query: ({ id, ...data }) => ({
+        url: `/advertisements/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Advertisements"],
+    }),
   }),
 });
 
@@ -90,4 +101,5 @@ export const {
   useGetAllAdvertisementsQuery,
   useTrackAdViewMutation,
   useTrackAdClickMutation,
+  useUpdateAdvertisementMutation,
 } = advertisementsApi;
