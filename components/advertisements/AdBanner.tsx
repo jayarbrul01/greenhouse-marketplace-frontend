@@ -211,7 +211,7 @@ export function AdBanner() {
         {validAds.map((ad) => (
           <div
             key={ad.id}
-            className="rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow"
           >
             <a
               href={ad.websiteUrl || "#"}
