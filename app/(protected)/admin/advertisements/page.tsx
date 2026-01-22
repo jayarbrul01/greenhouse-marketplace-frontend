@@ -1,19 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useGetAllAdvertisementsQuery, useUpdateAdvertisementMutation } from "@/store/api/advertisements.api";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/layout/Container";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import toast from "react-hot-toast";
 
 export default function AdminAdvertisementsPage() {
   const { t } = useLanguage();
+  const router = useRouter();
+  const { isAdmin, isLoading: isCheckingAdmin } = useIsAdmin();
   const [page, setPage] = useState(1);
   const limit = 20;
   const { data, isLoading, refetch } = useGetAllAdvertisementsQuery({ page, limit });
   const [updateAdvertisement, { isLoading: isUpdating }] = useUpdateAdvertisementMutation();
+
+  useEffect(() => {
+    if (!isCheckingAdmin && !isAdmin) {
+      toast.error("Access denied. Admin role required.");
+      router.push("/profile");
+    }
+  }, [isAdmin, isCheckingAdmin, router]);
 
   const handleApprove = async (id: string) => {
     try {
@@ -55,7 +66,7 @@ export default function AdminAdvertisementsPage() {
     }
   };
 
-  if (isLoading) {
+  if (isCheckingAdmin || isLoading) {
     return (
       <Container>
         <div className="flex items-center justify-center py-12">
@@ -63,6 +74,10 @@ export default function AdminAdvertisementsPage() {
         </div>
       </Container>
     );
+  }
+
+  if (!isAdmin) {
+    return null; // Will redirect
   }
 
   const advertisements = data?.advertisements || [];

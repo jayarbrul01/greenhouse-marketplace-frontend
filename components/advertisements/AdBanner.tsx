@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useGetActiveAdvertisementsQuery, useTrackAdViewMutation, useTrackAdClickMutation } from "@/store/api/advertisements.api";
 import { Spinner } from "@/components/ui/Spinner";
 import type { Advertisement } from "@/store/api/advertisements.api";
 
 export function AdBanner() {
+  const pathname = usePathname();
   const { data, isLoading } = useGetActiveAdvertisementsQuery();
   const [trackView] = useTrackAdViewMutation();
   const [trackClick] = useTrackAdClickMutation();
@@ -14,6 +16,9 @@ export function AdBanner() {
   const [adPosition, setAdPosition] = useState<"center" | "below-search">("center");
   const [topPosition, setTopPosition] = useState<string>("50%");
   const [transform, setTransform] = useState<string>("translateY(-50%)");
+  
+  // Hide ad banner on admin pages
+  const isAdminPage = pathname?.startsWith("/admin");
 
   // Get ads sorted by creation date (latest first)
   const sortedAds = useMemo(() => {
@@ -173,6 +178,11 @@ export function AdBanner() {
       window.open(ad.websiteUrl, "_blank", "noopener,noreferrer");
     }
   };
+
+  // Hide ad banner on admin pages - check after all hooks are called
+  if (isAdminPage) {
+    return null;
+  }
 
   if (isLoading) {
     return (

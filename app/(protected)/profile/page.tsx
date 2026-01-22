@@ -208,8 +208,8 @@ export default function ProfilePage() {
     }
   };
 
-  const isSeller = profile?.roles?.includes("SELLER") || false;
-  const canUpload = profile?.roles?.some((role: string) => ["SELLER", "BUYER", "WISHLIST"].includes(role)) || false;
+  const isSeller = profile?.roles?.includes("SELLER") || profile?.roles?.includes("ADMIN") || false;
+  const canUpload = profile?.roles?.some((role: string) => ["SELLER", "BUYER", "WISHLIST", "ADMIN"].includes(role)) || false;
 
   const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

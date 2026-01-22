@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type AuthState = {
   isAuthenticated: boolean;
-  user: { email: string; name?: string } | null;
+  user: { email: string; name?: string; roles?: string[] } | null;
 };
 
 const initialState: AuthState = {

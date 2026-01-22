@@ -32,8 +32,8 @@ export default function ProductDetailPage() {
   // Delete confirmation modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const isSeller = profile?.roles?.includes("SELLER") || false;
-  const canUpload = profile?.roles?.some((role: string) => ["SELLER", "BUYER", "WISHLIST"].includes(role)) || false;
+  const isSeller = profile?.roles?.includes("SELLER") || profile?.roles?.includes("ADMIN") || false;
+  const canUpload = profile?.roles?.some((role: string) => ["SELLER", "BUYER", "WISHLIST", "ADMIN"].includes(role)) || false;
   const [isEditing, setIsEditing] = useState(false);
 
   // Form state
